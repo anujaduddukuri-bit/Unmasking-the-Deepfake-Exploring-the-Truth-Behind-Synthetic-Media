@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unmasking the Deepfake | Video Frame Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-background"></div>
+  <main class="main-container">
+    <header class="hero-header">
+      <div class="header-logo-container" style="display:flex; justify-content:center; align-items:center; margin-bottom:12px;">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width:64px; height:64px; border-radius:50%; border:2px solid #00f0ff; box-shadow:0 0 20px rgba(0,240,255,0.4);">
+      </div>
+      <div class="header-badge-row">
+        <span class="cyber-badge"><i class="glow-dot"></i> TEMPORAL SEQUENCE FORENSICS</span>
+        <span class="tech-pill">FAST ANALYSIS (&lt;15s)</span>
+      </div>
+      <h1 class="main-title">VIDEO FRAME LAB</h1>
+      <p class="main-subtitle">Multi-Frame Temporal Deepfake Detection & Separate Frame Decomposition</p>
+      
+      <nav class="nav-bar">
+        <a href="{{ url_for('welcome') }}" class="nav-item nav-link">← Welcome Page</a>
+        <a href="{{ url_for('image_lab') }}" class="nav-item nav-link">Single Image Lab</a>
+        <span class="nav-item active">Video Frame Lab</span>
+      </nav>
+    </header>
+
+    <section class="upload-panel glass-card">
+      <div class="feature-pills-row">
+        <span class="feat-pill">⏱️ Max 30 FPS Ceiling</span>
+        <span class="feat-pill">🎞️ 30 Separate Frames</span>
+        <span class="feat-pill">🧠 ONNX Sequence Model</span>
+        <span class="feat-pill">📊 Dedicated Dossier Report</span>
+      </div>
+      
+      <label id="dropzone" for="file" class="dropzone-label">
+        <div class="drop-icon-wrapper">
+          <div class="radar-scan"></div>
+          <span class="icon">🎬</span>
+        </div>
+        <div class="drop-text-group">
+          <strong class="drop-title">Drop video media here or click to browse</strong>
+          <span class="drop-sub">Supports MP4, AVI, MOV, MKV, or WEBM · Up to 30 frames extracted</span>
+        </div>
+        <input id="file" type="file" accept="video/*" hidden>
+      </label>
+      
+      <div id="preview-wrapper" class="preview-container" hidden>
+        <video id="preview" controls muted></video>
+      </div>
+      
+      <button id="analyze" class="btn-primary" disabled>
+        <span class="btn-text">Extract & Analyze Video Sequence</span>
+        <span class="btn-icon">⚡</span>
+      </button>
+      
+      <div id="progress-container" class="progress-box" hidden>
+        <div class="cyber-spinner"></div>
+        <p id="status" class="status-msg" role="status">Ready to analyze</p>
+      </div>
+    </section>
+
+    <section class="panel glass-card explanation-panel">
+      <h3>VIDEO FORENSIC PIPELINE ARCHITECTURE</h3>
+      <div class="expl-grid-3">
+        <div class="expl-card">
+          <div class="expl-icon">⏱️</div>
+          <h4>Uniform Frame Sampling (Max 30 FPS)</h4>
+          <p>Extracts up to 30 individual frames spaced uniformly across the timeline at a strict ceiling of 30 FPS, preserving key motion dynamics and facial micro-expressions.</p>
+        </div>
+        <div class="expl-card">
+          <div class="expl-icon">🖼️</div>
+          <h4>Separate Frame Forensics</h4>
+          <p>Every single extracted frame is evaluated individually with its dedicated Noise Blueprint and Heatmap.</p>
+        </div>
+        <div class="expl-card">
+          <div class="expl-icon">📈</div>
+          <h4>Temporal Inconsistency Metrics</h4>
+          <p>Calculates inter-frame flickering, optical flow luminance shift, and noise variance jitter across adjacent frames to identify generative incoherence.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='video.js') }}"></script>
+</body>
+</html>
+

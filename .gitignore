@@ -1,0 +1,34 @@
+# Python cached files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment files
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Output directories & user uploads
+uploads/*
+!uploads/.gitkeep
+static/uploads/*
+!static/uploads/.gitkeep
+results/*
+!results/.gitkeep
+
+# Heavy weights or large models (if any)
+*.pth
+*.pt
+*.onnx
+*.bin
+*.h5
+
+# IDE / OS junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
