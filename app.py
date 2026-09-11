@@ -85,7 +85,7 @@ def analyze():
             image.verify()
             
         result = predict_image(path, demonstration_mode=True)
-        result["original_image"] = url_for("static", filename=f"uploads/{filename}")
+        result["original_image"] = url_for("uploaded_file", filename=filename)
         result["heatmap_image"] = url_for("generated", filename=Path(result["heatmap_path"]).name)
         result["blueprint_image"] = url_for("generated", filename=Path(result["blueprint_path"]).name)
         return jsonify(result)
@@ -137,12 +137,18 @@ def analyze_video():
 @app.get("/generated/<filename>")
 def generated(filename):
     from flask import send_from_directory
-    return send_from_directory(HEATMAPS_DIR, filename)
+    return send_from_directory(str(HEATMAPS_DIR), filename)
+
+@app.get("/uploads/<filename>")
+def uploaded_file(filename):
+    """Serve uploaded files from the writable uploads directory (supports /tmp on Vercel)."""
+    from flask import send_from_directory
+    return send_from_directory(str(UPLOADS_DIR), filename)
 
 @app.get("/video-frames/<job_id>/<filename>")
 def video_file(job_id, filename):
     from flask import send_from_directory
-    return send_from_directory(VIDEO_FRAMES_DIR / job_id, filename)
+    return send_from_directory(str(VIDEO_FRAMES_DIR / job_id), filename)
 
 if __name__ == "__main__":
     app.run(debug=False, host="127.0.0.1", port=5000)
