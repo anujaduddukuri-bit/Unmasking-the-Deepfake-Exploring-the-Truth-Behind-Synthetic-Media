@@ -1,9 +1,7 @@
-torch
-torchvision
 flask
-opencv-python
+opencv-python-headless
 numpy
 pillow
-scikit-learn
-onnx
 onnxruntime
+gunicorn
+

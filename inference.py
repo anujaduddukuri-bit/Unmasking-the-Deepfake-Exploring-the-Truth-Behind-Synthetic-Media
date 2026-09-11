@@ -6,18 +6,16 @@ import argparse
 from pathlib import Path
 import cv2
 import numpy as np
-import torch
 from PIL import Image
 
-from model import ResNetLSTMDetector
 from preprocessing import preprocess_frames, extract_video_frames
 from color_analysis import analyze_color
 from noise_analysis import analyze_noise, sand_noise_blueprint
 from grayscale_analysis import analyze_grayscale
 from heatmap import generate_visualizations
 from video_forensics import compute_temporal_metrics
-from export_onnx import ensure_onnx_model
 from utils import MODEL_PATH, ONNX_MODEL_PATH, HEATMAPS_DIR, VIDEO_FRAMES_DIR, ensure_directories
+
 
 class ONNXDetector:
     """High-performance ONNX Runtime wrapper for ResNet18-LSTM sequence detector."""
@@ -61,24 +59,31 @@ def load_detector(device=None):
         except Exception:
             pass
 
-    # Check for PyTorch weights
+    # Check for PyTorch weights if torch is available
     if MODEL_PATH.exists():
-        dev = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        checkpoint = torch.load(MODEL_PATH, map_location=dev, weights_only=False)
-        model = ResNetLSTMDetector(pretrained=False, **checkpoint.get("model_config", {})).to(dev)
-        model.load_state_dict(checkpoint["model_state_dict"])
-        model.eval()
-        mapping = checkpoint.get("class_to_idx", {"fake": 0, "real": 1})
-        return model, "PyTorch Engine (deepfake_model.pth)", mapping
+        try:
+            import torch
+            from model import ResNetLSTMDetector
+            dev = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            checkpoint = torch.load(MODEL_PATH, map_location=dev, weights_only=False)
+            model = ResNetLSTMDetector(pretrained=False, **checkpoint.get("model_config", {})).to(dev)
+            model.load_state_dict(checkpoint["model_state_dict"])
+            model.eval()
+            mapping = checkpoint.get("class_to_idx", {"fake": 0, "real": 1})
+            return model, "PyTorch Engine (deepfake_model.pth)", mapping
+        except Exception:
+            pass
 
-    # Auto-export ONNX model with pretrained backbone
+    # Auto-export ONNX model with pretrained backbone if exporter is available
     try:
+        from export_onnx import ensure_onnx_model
         exported_path = ensure_onnx_model(ONNX_MODEL_PATH)
         return ONNXDetector(exported_path), "ONNX Runtime (deepfake_model.onnx)", {"fake": 0, "real": 1}
     except Exception:
         pass
 
     raise FileNotFoundError("Neither ONNX nor PyTorch model weights could be loaded.")
+
 
 def predict_image(image_path, demonstration_mode=True):
     """Analyze single image with Sand-Pour Noise Blueprint, Heatmap, and ONNX detector."""
@@ -109,6 +114,7 @@ def predict_image(image_path, demonstration_mode=True):
         if isinstance(detector, ONNXDetector):
             probability, cnn_sig, lstm_sig = detector.score_sequence(frames_tensor)
         else:
+            import torch
             dev = next(detector.parameters()).device
             with torch.no_grad():
                 prob_tensor, cnn_t, lstm_t = detector.score_components(frames_tensor.to(dev))
@@ -199,6 +205,7 @@ def predict_video(video_path, job_id, demonstration_mode=True):
         if isinstance(detector, ONNXDetector):
             seq_prob, cnn_sig, lstm_sig = detector.score_sequence(frames_tensor)
         else:
+            import torch
             dev = next(detector.parameters()).device
             with torch.no_grad():
                 prob_tensor, cnn_t, lstm_t = detector.score_components(frames_tensor.to(dev))

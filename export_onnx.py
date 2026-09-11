@@ -2,9 +2,8 @@
 import os
 import argparse
 from pathlib import Path
-import torch
-from model import ResNetLSTMDetector
 from utils import MODEL_PATH, MODELS_DIR, ensure_directories
+
 
 os.environ["PYTHONIOENCODING"] = "utf-8"
 ONNX_MODEL_PATH = MODELS_DIR / "deepfake_model.onnx"
@@ -16,6 +15,9 @@ def export_model_to_onnx(output_path=None, force=False):
     if out_file.exists() and not force:
         return out_file
 
+    import torch
+    from model import ResNetLSTMDetector
+
     if MODEL_PATH.exists():
         checkpoint = torch.load(MODEL_PATH, map_location="cpu", weights_only=False)
         model = ResNetLSTMDetector(pretrained=False, **checkpoint.get("model_config", {}))
@@ -23,6 +25,7 @@ def export_model_to_onnx(output_path=None, force=False):
     else:
         # Pretrained ResNet-18 backbone + initialized LSTM classifier
         model = ResNetLSTMDetector(pretrained=True, hidden_size=256, lstm_layers=1, dropout=0.25)
+
     
     model.eval()
     sample = torch.randn(1, 1, 3, 224, 224)

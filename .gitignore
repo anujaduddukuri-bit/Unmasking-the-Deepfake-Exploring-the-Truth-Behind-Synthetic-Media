@@ -24,8 +24,10 @@ results/*
 *.pth
 *.pt
 *.onnx
+!models/deepfake_model.onnx
 *.bin
 *.h5
+
 
 # IDE / OS junk
 .DS_Store

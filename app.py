@@ -7,14 +7,10 @@ from werkzeug.utils import secure_filename
 from PIL import Image, UnidentifiedImageError
 
 from inference import predict_image, predict_video
-from export_onnx import ensure_onnx_model
 from utils import UPLOADS_DIR, VIDEO_FRAMES_DIR, HEATMAPS_DIR, allowed_file, allowed_video, ensure_directories
 
 ensure_directories()
-try:
-    ensure_onnx_model()
-except Exception as e:
-    logging.warning("ONNX initialization check: %s", e)
+
 
 app = Flask(__name__)
 app.config.update(UPLOAD_FOLDER=str(UPLOADS_DIR))

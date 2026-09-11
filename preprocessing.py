@@ -2,24 +2,33 @@
 import math
 import cv2
 import numpy as np
-import torch
 from PIL import Image
-from torchvision import transforms
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
-def inference_transform():
-    return transforms.Compose([transforms.Resize((224, 224)), transforms.ToTensor(),
-                               transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD)])
-
 def preprocess_pil(image):
-    return inference_transform()(image.convert("RGB"))
+    """Preprocess PIL image into normalized float32 CHW array (224x224)."""
+    img = image.convert("RGB").resize((224, 224), Image.Resampling.BILINEAR)
+    arr = np.array(img, dtype=np.float32) / 255.0
+    mean = np.array(IMAGENET_MEAN, dtype=np.float32)
+    std = np.array(IMAGENET_STD, dtype=np.float32)
+    norm = (arr - mean) / std
+    return np.transpose(norm, (2, 0, 1))  # Shape: (3, 224, 224)
 
 def preprocess_frames(frames):
     """Convert RGB PIL images into [batch, sequence, channels, height, width]."""
-    if not frames: raise ValueError("No frames were supplied.")
-    return torch.stack([preprocess_pil(frame) for frame in frames]).unsqueeze(0)
+    if not frames:
+        raise ValueError("No frames were supplied.")
+    processed = [preprocess_pil(frame) for frame in frames]
+    stacked = np.stack(processed, axis=0)  # Shape: [seq, 3, 224, 224]
+    batched = np.expand_dims(stacked, axis=0)  # Shape: [1, seq, 3, 224, 224]
+    try:
+        import torch
+        return torch.from_numpy(batched).float()
+    except ImportError:
+        return batched
+
 
 def extract_video_frames(video_path, max_frames=30, max_fps=30):
     """Extract individual RGB frames uniformly across the video at up to 30 FPS.
