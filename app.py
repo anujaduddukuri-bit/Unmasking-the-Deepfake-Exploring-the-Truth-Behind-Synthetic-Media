@@ -216,10 +216,13 @@ def analyze():
 
         result = predict_image(path, demonstration_mode=False)
 
-        # Embed all 3 images as base64 data URIs (works on Vercel read-only FS)
-        result["original_image"]  = _b64(path, _mime(path))
-        result["heatmap_image"]   = _b64(result.get("heatmap_path", ""))
-        result["blueprint_image"] = _b64(result.get("blueprint_path", ""))
+        # Use optimized in-memory base64 URIs from predict_image; fall back only if missing
+        if not result.get("original_image"):
+            result["original_image"]  = _b64(path, _mime(path))
+        if not result.get("heatmap_image"):
+            result["heatmap_image"]   = _b64(result.get("heatmap_path", ""))
+        if not result.get("blueprint_image"):
+            result["blueprint_image"] = _b64(result.get("blueprint_path", ""))
 
         result.pop("heatmap_path",   None)
         result.pop("blueprint_path", None)
