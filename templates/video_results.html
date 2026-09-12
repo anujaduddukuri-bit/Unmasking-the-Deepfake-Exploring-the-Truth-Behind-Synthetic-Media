@@ -690,18 +690,18 @@
             </div>
           </div>
 
-          <!-- Fixed Order: 01 Original -> 02 Noise Blueprint -> 03 Heatmap (Eager rendering) -->
+          <!-- Fixed Order: 01 Original -> 02 Noise Blueprint -> 03 Heatmap (Lazy loading for performance) -->
           <div class="frame-views-grid">
             <figure class="thumb-fig" title="01 Original: Untouched extracted frame">
-              <img src="{{ f.original_image }}" alt="Original Frame {{ f.number }}" loading="eager">
+              <img src="{{ f.original_image }}" alt="Original Frame {{ f.number }}" loading="lazy" decoding="async">
               <figcaption>01 ORIGINAL</figcaption>
             </figure>
             <figure class="thumb-fig" title="02 Noise Blueprint: High-frequency residual noise stippling">
-              <img src="{{ f.blueprint_image }}" alt="Noise Blueprint" loading="eager">
+              <img src="{{ f.blueprint_image }}" alt="Noise Blueprint" loading="lazy" decoding="async">
               <figcaption>02 BLUEPRINT</figcaption>
             </figure>
             <figure class="thumb-fig" title="03 Heatmap: Thermal anomaly intensity map">
-              <img src="{{ f.heatmap_image }}" alt="Heatmap" loading="eager">
+              <img src="{{ f.heatmap_image }}" alt="Heatmap" loading="lazy" decoding="async">
               <figcaption>03 HEATMAP</figcaption>
             </figure>
           </div>

@@ -189,17 +189,19 @@ html, body {
   transform: translateY(-1px);
 }
 
-/* Glassmorphism Cards */
+/* Glassmorphism Cards — GPU-promoted for smooth scroll */
 .glass-card {
   background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
   padding: 28px;
   margin-bottom: 28px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transform: translateZ(0);
+  contain: layout style;
 }
 
 .glass-card:hover {
@@ -1497,6 +1499,28 @@ html, body {
 
 .highlight-pulse {
   animation: highlightPulse 1.8s ease-in-out;
+}
+
+/* ============================================
+   SCROLL PERFORMANCE: content-visibility
+   Tells the browser to skip rendering off-screen
+   frame cards, dramatically reducing scroll jank
+   ============================================ */
+.separate-frames-grid .frame-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 420px; /* approximate rendered height */
+  will-change: transform;
+}
+
+/* Optimised separate-frames-grid — GPU composited */
+.separate-frames-grid {
+  contain: layout style;
+}
+
+/* Perf: thumb images already have lazy attr; add contain */
+.thumb-fig img {
+  contain: strict;
+  will-change: auto;
 }
 
 
