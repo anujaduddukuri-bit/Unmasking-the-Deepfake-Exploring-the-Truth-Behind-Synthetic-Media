@@ -3,97 +3,525 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Video Forensics Report | Unmasking the Deepfake</title>
+  <title>Video Forensics Report | Unmasking Deepfake AI</title>
+  <meta name="description" content="Comprehensive video sequence forensics dossier — temporal consistency, frame-by-frame noise blueprint, and artifact anomaly telemetry.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://unmasking-deepfake.vercel.app/video-results/{{ job_id }}">
+
+  <!-- Favicon -->
+  <link rel="icon"             type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon"             type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <link rel="icon"             type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180"  href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <meta name="theme-color" content="#020617">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Video Forensics Report | Unmasking Deepfake">
+  <meta property="og:description" content="Deepfake sequence verification report and frame-by-frame noise blueprint dossier.">
+  <meta property="og:image" content="{{ url_for('static', filename='logo.png') }}">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Executive Forensics Dossier Styles */
+    .executive-dossier-card {
+      padding: 28px;
+      margin-bottom: 24px;
+      border-radius: 18px;
+      border: 1px solid var(--border-cyan);
+      background: linear-gradient(135deg, rgba(11, 19, 41, 0.95) 0%, rgba(2, 6, 23, 0.98) 100%);
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.12);
+    }
+    .dossier-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .dossier-verdict-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 22px 28px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .dossier-verdict-banner.banner-real {
+      background: linear-gradient(135deg, rgba(0, 255, 135, 0.12) 0%, rgba(2, 6, 23, 0.9) 100%);
+      border-color: rgba(0, 255, 135, 0.4);
+      box-shadow: 0 0 30px rgba(0, 255, 135, 0.15);
+    }
+    .dossier-verdict-banner.banner-fake {
+      background: linear-gradient(135deg, rgba(255, 42, 95, 0.12) 0%, rgba(2, 6, 23, 0.9) 100%);
+      border-color: rgba(255, 42, 95, 0.4);
+      box-shadow: 0 0 30px rgba(255, 42, 95, 0.18);
+    }
+    .dossier-verdict-banner.banner-uncertain {
+      background: linear-gradient(135deg, rgba(244, 211, 94, 0.12) 0%, rgba(2, 6, 23, 0.9) 100%);
+      border-color: rgba(244, 211, 94, 0.4);
+      box-shadow: 0 0 30px rgba(244, 211, 94, 0.15);
+    }
+    .verdict-sub-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .verdict-hero-text {
+      font-family: var(--font-heading);
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+    .verdict-confidence-badge {
+      text-align: right;
+      padding: 8px 18px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .conf-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: block;
+    }
+    .conf-pct {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+    }
+    .executive-specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .spec-tile {
+      background: rgba(2, 6, 23, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .spec-tile:hover {
+      border-color: rgba(0, 240, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    .spec-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .spec-value {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      color: #fff;
+    }
+    /* Comparison Slider Widget in Modal */
+    .slider-comparison-box {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      height: 420px;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--border-cyan);
+      user-select: none;
+      background: #020617;
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.15);
+    }
+    .slider-img-target,
+    .slider-img-orig {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    .slider-img-target {
+      z-index: 1;
+    }
+    .slider-img-orig {
+      z-index: 2;
+      clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+      filter: none !important;
+    }
+    .slider-handle-bar {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 3px;
+      height: 100%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.8);
+      z-index: 3;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .slider-handle-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #020617;
+      border: 2px solid var(--cyan);
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.9);
+      font-size: 0.9rem;
+      font-weight: bold;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .slider-range-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: ew-resize;
+      z-index: 5;
+      margin: 0;
+    }
+    /* Frame Scrubber Styles */
+    .frame-scrubber-container {
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid var(--border-cyan);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .scrubber-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .scrubber-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .scrubber-track-input {
+      flex: 1;
+      height: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(0, 240, 255, 0.2);
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+    .scrubber-track-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.9);
+      cursor: pointer;
+      border: 2px solid #020617;
+    }
+    /* Frame Results Table */
+    .frame-table-wrapper {
+      margin-top: 20px;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+    .cyber-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+      background: rgba(2, 6, 23, 0.6);
+    }
+    .cyber-table th {
+      background: rgba(11, 19, 41, 0.9);
+      padding: 12px 14px;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .cyber-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+    }
+    .cyber-table tr:hover {
+      background: rgba(0, 240, 255, 0.04);
+    }
+  </style>
 </head>
 <body class="results-page">
   <div class="app-background"></div>
   <main class="wide-main">
     <header class="report-header">
       <div style="display:flex; justify-content:center; margin-bottom:12px;">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width:54px; height:54px; border-radius:50%; border:2px solid #00f0ff; box-shadow:0 0 15px rgba(0,240,255,0.4);">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width:62px; height:62px; border-radius:50%; border:2px solid #00f0ff; box-shadow:0 0 20px rgba(0,240,255,0.4);">
       </div>
       <div class="nav-bar">
-        <a href="{{ url_for('welcome') }}" class="nav-link">← Welcome Page</a>
+        <a href="{{ url_for('welcome') }}"   class="nav-link">← Welcome</a>
         <a href="{{ url_for('image_lab') }}" class="nav-link">Single Image Lab</a>
-        <a href="{{ url_for('video') }}" class="nav-link">Video Lab</a>
+        <a href="{{ url_for('video') }}"     class="nav-link">Video Lab</a>
+        <a href="{{ url_for('about') }}"     class="nav-link">How It Works</a>
       </div>
       <p class="eyebrow">COMPREHENSIVE VIDEO FORENSICS DOSSIER</p>
-      <h1>VIDEO ANALYSIS REPORT</h1>
-      <p class="meta-line">Job ID: <span class="mono">{{ job_id }}</span> · {{ result.frame_count }} Separate Frames Extracted</p>
+      <h1>VIDEO FORENSICS DOSSIER</h1>
+      <p class="meta-line">Job ID: <span class="mono">{{ job_id }}</span> · {{ result.frame_count }} Frames Analyzed · Duration: {{ result.duration_seconds }}s</p>
     </header>
 
-    <!-- Top Verdict & Aggregated Metrics Banner -->
-    <section class="verdict-banner panel glass-card">
-      <div class="verdict-main">
-        <div class="engine-badge">{{ result.engine }}</div>
-        <p class="verdict-subtitle">OVERALL SEQUENCE VERDICT</p>
-        <h2 class="verdict-title {% if result.prediction == 'DEEPFAKE' %}verdict-fake{% elif result.prediction == 'REAL' %}verdict-real{% else %}verdict-demo{% endif %}">
-          {% if result.prediction == 'DEEPFAKE' %}DEEPFAKE DETECTED
-          {% elif result.prediction == 'REAL' %}REAL MEDIA
-          {% else %}FORENSIC DEMONSTRATION{% endif %}
-        </h2>
-        
-        <!-- Real vs Deepfake Percentage Readout -->
-        <div class="percentage-split-bar">
-          <div class="percentage-pill pill-real">
-            <span class="pct-lbl">REAL MEDIA</span>
-            <strong class="pct-num">{{ "%.2f"|format(result.real_percentage if result.real_percentage is defined else (100.0 - result.confidence)) }}%</strong>
-          </div>
-          <div class="percentage-pill pill-fake">
-            <span class="pct-lbl">DEEPFAKE</span>
-            <strong class="pct-num">{{ "%.2f"|format(result.fake_percentage if result.fake_percentage is defined else result.confidence) }}%</strong>
-          </div>
-        </div>
+    <!-- 1. EXECUTIVE FORENSICS DOSSIER PANEL (Directly matching user requirements) -->
+    <section class="executive-dossier-card glass-card">
+      <div class="dossier-header-row">
+        <div class="cyber-chip"><i class="glow-dot"></i> MULTI-FRAME SEQUENCE AUDIT · ONNX RUNTIME</div>
+        <span class="mono" style="color:var(--text-muted); font-size:0.75rem;">SHA-256: {{ job_id[:16] }}…</span>
+      </div>
 
-        <div class="confidence-box">
-          <span class="conf-num">{{ "%.2f"|format(result.confidence) }}%</span>
-          <span class="conf-lbl">AI CONFIDENCE / INTENSITY</span>
+      <div class="dossier-verdict-banner {% if result.prediction == 'REAL' %}banner-real{% elif result.prediction == 'FAKE' %}banner-fake{% else %}banner-uncertain{% endif %}">
+        <div class="verdict-primary-display">
+          <span class="verdict-sub-lbl">PRIMARY SEQUENCE AUDIT VERDICT</span>
+          <h1 class="verdict-hero-text {% if result.prediction == 'REAL' %}text-emerald{% elif result.prediction == 'FAKE' %}text-crimson{% else %}text-gold{% endif %}">
+            {{ result.overall_verdict_text }}
+          </h1>
+        </div>
+        <div class="verdict-confidence-badge">
+          <span class="conf-title">CONFIDENCE</span>
+          <strong class="conf-pct {% if result.prediction == 'REAL' %}text-emerald{% elif result.prediction == 'FAKE' %}text-crimson{% else %}text-gold{% endif %}">{{ "%.1f"|format(result.confidence) }}%</strong>
         </div>
       </div>
 
-      <div class="metrics-summary-grid">
-        <div class="metric-card">
-          <span class="card-label">REAL vs DEEPFAKE SPLIT</span>
-          <strong class="card-value">{{ "%.1f"|format(result.real_percentage if result.real_percentage is defined else (100.0 - result.confidence)) }}% Real / {{ "%.1f"|format(result.fake_percentage if result.fake_percentage is defined else result.confidence) }}% Fake</strong>
-          <span class="card-sub">Multi-scale parameter weighted probability</span>
+      <div class="executive-specs-grid">
+        <div class="spec-tile">
+          <span class="spec-label">Frames analyzed</span>
+          <strong class="spec-value">{{ result.frame_count }}</strong>
         </div>
-        <div class="metric-card">
-          <span class="card-label">TEMPORAL INCONSISTENCY</span>
-          <strong class="card-value">{{ result.temporal_inconsistency_score }}%</strong>
-          <span class="card-sub">Inter-frame flickering & motion shift</span>
+        <div class="spec-tile">
+          <span class="spec-label">Real frames</span>
+          <strong class="spec-value text-emerald">{{ result.real_frames }}</strong>
         </div>
-        <div class="metric-card">
-          <span class="card-label">NOISE VARIANCE JITTER</span>
-          <strong class="card-value">{{ result.temporal_jitter_score }}%</strong>
-          <span class="card-sub">Sensor grain fluctuation across frames</span>
+        <div class="spec-tile">
+          <span class="spec-label">Suspicious frames</span>
+          <strong class="spec-value {% if result.suspicious_frames > 0 %}text-crimson{% else %}text-emerald{% endif %}">{{ result.suspicious_frames }}</strong>
         </div>
-        <div class="metric-card">
-          <span class="card-label">PEAK SUSPICIOUS FRAME</span>
-          <strong class="card-value card-alert">Frame #{{ result.peak_frame }}</strong>
-          <span class="card-sub">Score: {{ result.peak_score }}% (at {{ "%.2f"|format(result.peak_timestamp) }}s)</span>
+        <div class="spec-tile">
+          <span class="spec-label">Temporal consistency</span>
+          <strong class="spec-value {% if result.temporal_consistency == 'High' %}text-emerald{% elif result.temporal_consistency == 'Medium' %}text-gold{% else %}text-crimson{% endif %}">{{ result.temporal_consistency }}</strong>
         </div>
+        <div class="spec-tile">
+          <span class="spec-label">Face detection status</span>
+          <strong class="spec-value" style="font-size:0.92rem;">{{ result.face_detection_status }}</strong>
+        </div>
+        <div class="spec-tile">
+          <span class="spec-label">Artifact/anomaly score</span>
+          <strong class="spec-value">{{ result.artifact_anomaly_score }}%</strong>
+        </div>
+        <div class="spec-tile">
+          <span class="spec-label">Compression/noise indicators</span>
+          <strong class="spec-value" style="font-size:0.92rem;">{{ result.compression_indicator if result.compression_indicator is defined else "Natural Sensor Noise Floor" }}</strong>
+        </div>
+        <div class="spec-tile">
+          <span class="spec-label">Real vs Deepfake Ratio</span>
+          <strong class="spec-value">{{ result.real_percentage }}% Real / {{ result.fake_percentage }}% Fake</strong>
+        </div>
+      </div>
     </section>
 
-    <!-- Forensic Telemetry Signals Panel (Overall Sequence) -->
+    <!-- 2. FEATURED VIDEO FRAME FORENSICS CONSOLE & INTERACTIVE COMPARISON SLIDER -->
+    {% if result.frames and result.frames|length > 0 %}
+    {% set f0 = result.frames[0] %}
+    <section class="panel glass-card" id="featured-frame-section" style="margin-bottom: 24px;">
+      <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
+        <div>
+          <div class="cyber-chip" style="margin-bottom: 6px;"><i class="glow-dot"></i> ACTIVE FRAME FORENSICS CONSOLE</div>
+          <h3 id="active-frame-heading">FRAME #01 FORENSIC INSPECTION</h3>
+          <p class="panel-sub" id="active-frame-sub">Timestamp: 0.00s · Slide horizontally to inspect untouched raw original vs forensic anomaly overlays</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div id="active-frame-verdict-badge" class="frame-badge {% if f0.frame_verdict == 'FAKE' %}badge-high{% elif f0.frame_verdict == 'REAL' %}badge-low{% else %}badge-med{% endif %}">
+            {{ f0.frame_verdict }} ({{ "%.1f"|format(f0.suspicion_score) }}%)
+          </div>
+          <div class="controls-row">
+            <button id="feat-mode-blueprint" class="btn-filter active" style="font-size:0.75rem; padding:6px 12px;">↔ Original vs Noise Blueprint</button>
+            <button id="feat-mode-heatmap" class="btn-filter" style="font-size:0.75rem; padding:6px 12px;">↔ Original vs Heatmap</button>
+            <button id="feat-mode-side" class="btn-filter" style="font-size:0.75rem; padding:6px 12px;">3-Way Side-by-Side</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Frame Scrubber Slider -->
+      <div class="frame-scrubber-container">
+        <div class="scrubber-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="spec-label" style="margin:0; font-size:0.78rem;">🎞️ FRAME SCRUBBER:</span>
+            <strong id="scrubber-frame-num" class="mono" style="color:var(--cyan); font-size:0.9rem;">Frame 01 / {{ "%02d"|format(result.frame_count) }}</strong>
+            <span id="scrubber-frame-time" class="mono" style="color:var(--text-muted); font-size:0.78rem;">(0.00s)</span>
+          </div>
+          <span style="font-size:0.72rem; color:var(--text-muted); font-family:var(--font-mono);">
+            ◀ Slide across all {{ result.frame_count }} video frames ▶
+          </span>
+        </div>
+        <div class="scrubber-slider-row">
+          <button id="scrubber-prev-btn" class="btn-nav" style="padding:6px 14px; font-size:0.78rem;">◀ Prev</button>
+          <input type="range" id="featured-frame-scrubber" min="1" max="{{ result.frame_count }}" value="1" class="scrubber-track-input" aria-label="Scrub video frames">
+          <button id="scrubber-next-btn" class="btn-nav" style="padding:6px 14px; font-size:0.78rem;">Next ▶</button>
+        </div>
+      </div>
+
+      <!-- Interactive Wiper Slider Container -->
+      <div id="feat-slider-view">
+        <div class="slider-comparison-box" id="featured-slider-box">
+          <!-- Layer 1 (Background): Forensic Overlay (Noise Blueprint or Heatmap) -->
+          <img id="featured-slider-target" class="slider-img-target" src="{{ f0.blueprint_image }}" alt="Forensic Overlay">
+          <!-- Layer 2 (Foreground): 100% UNTOUCHED RAW ORIGINAL FRAME -->
+          <img id="featured-slider-orig" class="slider-img-orig" src="{{ f0.original_image }}" alt="Untouched Original Frame">
+          <!-- Wiper Handle -->
+          <div class="slider-handle-bar" id="featured-slider-handle"></div>
+          <div class="slider-handle-button" id="featured-slider-btn">↔</div>
+          <input type="range" min="0" max="100" value="50" class="slider-range-input" id="featured-slider-range" aria-label="Forensic wiper slider">
+        </div>
+        <div style="display:flex; justify-content:space-between; max-width:800px; margin:10px auto 0; font-family:var(--font-mono); font-size:0.78rem;">
+          <span style="color:var(--emerald);">◀ 100% UNTOUCHED ORIGINAL (SLIDE LEFT)</span>
+          <span style="color:var(--cyan);">FORENSIC ANOMALY LAYER (SLIDE RIGHT) ▶</span>
+        </div>
+      </div>
+
+      <!-- 3-Way Side-by-Side View (hidden by default) -->
+      <div id="feat-side-view" class="modal-compare-grid-3" hidden style="display:none; margin-top:16px;">
+        <figure class="thumb-fig">
+          <figcaption>01 UNTOUCHED ORIGINAL</figcaption>
+          <img id="feat-side-orig" src="{{ f0.original_image }}" alt="Untouched Original" style="width:100%; aspect-ratio:1; object-fit:contain;">
+        </figure>
+        <figure class="thumb-fig">
+          <figcaption>02 NOISE BLUEPRINT</figcaption>
+          <img id="feat-side-blue" src="{{ f0.blueprint_image }}" alt="Noise Blueprint" style="width:100%; aspect-ratio:1; object-fit:contain;">
+        </figure>
+        <figure class="thumb-fig">
+          <figcaption>03 HEATMAP</figcaption>
+          <img id="feat-side-heat" src="{{ f0.heatmap_image }}" alt="Heatmap" style="width:100%; aspect-ratio:1; object-fit:contain;">
+        </figure>
+      </div>
+
+      <!-- Active Frame Forensic Telemetry Grid -->
+      <div id="feat-telemetry-hud" style="margin-top: 18px;">
+        <div class="signals-hud-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+          <div class="signal-item" style="padding: 10px 12px; background: rgba(2, 6, 23, 0.8);">
+            <div class="signal-label-row">
+              <span class="signal-name" style="font-size:0.8rem;">Noise Blueprint Variance</span>
+              <span id="feat-tele-noise-tag" class="signal-tag {% if f0.noise_score > 45 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.62rem;">
+                {% if f0.noise_score > 45 %}SYNTHETIC STIPPLING{% else %}NATURAL SENSOR GRAIN{% endif %}
+              </span>
+            </div>
+            <div class="bar-track" style="height:6px;">
+              <div id="feat-tele-noise-bar" class="bar-fill {% if f0.noise_score > 45 %}bar-fake{% else %}bar-real{% endif %}" style="width:{{ f0.noise_score }}%"></div>
+            </div>
+            <div class="signal-impact-row" style="font-size:0.72rem;">
+              <span id="feat-tele-noise-real" class="impact-real">Real: {{ "%.1f"|format(100.0 - f0.noise_score) }}%</span>
+              <span id="feat-tele-noise-fake" class="impact-fake">Fake: {{ "%.1f"|format(f0.noise_score) }}%</span>
+              <b id="feat-tele-noise-val" class="signal-val">{{ "%.1f"|format(f0.noise_score) }}%</b>
+            </div>
+          </div>
+
+          <div class="signal-item" style="padding: 10px 12px; background: rgba(2, 6, 23, 0.8);">
+            <div class="signal-label-row">
+              <span class="signal-name" style="font-size:0.8rem;">Colour Balance &amp; HSV</span>
+              <span id="feat-tele-color-tag" class="signal-tag {% if f0.color_score > 35 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.62rem;">
+                {% if f0.color_score > 35 %}BOUNDARY SHIFT{% else %}BALANCED OPTICS{% endif %}
+              </span>
+            </div>
+            <div class="bar-track" style="height:6px;">
+              <div id="feat-tele-color-bar" class="bar-fill {% if f0.color_score > 35 %}bar-fake{% else %}bar-real{% endif %}" style="width:{{ f0.color_score }}%"></div>
+            </div>
+            <div class="signal-impact-row" style="font-size:0.72rem;">
+              <span id="feat-tele-color-real" class="impact-real">Real: {{ "%.1f"|format(100.0 - f0.color_score) }}%</span>
+              <span id="feat-tele-color-fake" class="impact-fake">Fake: {{ "%.1f"|format(f0.color_score) }}%</span>
+              <b id="feat-tele-color-val" class="signal-val">{{ "%.1f"|format(f0.color_score) }}%</b>
+            </div>
+          </div>
+
+          <div class="signal-item" style="padding: 10px 12px; background: rgba(2, 6, 23, 0.8);">
+            <div class="signal-label-row">
+              <span class="signal-name" style="font-size:0.8rem;">Grayscale Discrepancy</span>
+              <span id="feat-tele-gray-tag" class="signal-tag {% if f0.grayscale_score > 40 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.62rem;">
+                {% if f0.grayscale_score > 40 %}EDGE ANOMALY{% else %}UNIFORM LIGHTING{% endif %}
+              </span>
+            </div>
+            <div class="bar-track" style="height:6px;">
+              <div id="feat-tele-gray-bar" class="bar-fill {% if f0.grayscale_score > 40 %}bar-fake{% else %}bar-real{% endif %}" style="width:{{ f0.grayscale_score }}%"></div>
+            </div>
+            <div class="signal-impact-row" style="font-size:0.72rem;">
+              <span id="feat-tele-gray-real" class="impact-real">Real: {{ "%.1f"|format(100.0 - f0.grayscale_score) }}%</span>
+              <span id="feat-tele-gray-fake" class="impact-fake">Fake: {{ "%.1f"|format(f0.grayscale_score) }}%</span>
+              <b id="feat-tele-gray-val" class="signal-val">{{ "%.1f"|format(f0.grayscale_score) }}%</b>
+            </div>
+          </div>
+
+          <div class="signal-item" style="padding: 10px 12px; background: rgba(2, 6, 23, 0.8);">
+            <div class="signal-label-row">
+              <span class="signal-name" style="font-size:0.8rem;">Frame Suspicion Index</span>
+              <span id="feat-tele-susp-tag" class="signal-tag {% if f0.suspicion_score >= 50 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.62rem;">
+                {{ f0.frame_verdict }}
+              </span>
+            </div>
+            <div class="bar-track" style="height:6px;">
+              <div id="feat-tele-susp-bar" class="bar-fill {% if f0.suspicion_score >= 50 %}bar-fake{% else %}bar-real{% endif %}" style="width:{{ f0.suspicion_score }}%"></div>
+            </div>
+            <div class="signal-impact-row" style="font-size:0.72rem;">
+              <span id="feat-tele-susp-real" class="impact-real">Real: {{ "%.1f"|format(100.0 - f0.suspicion_score) }}%</span>
+              <span id="feat-tele-susp-fake" class="impact-fake">Fake: {{ "%.1f"|format(f0.suspicion_score) }}%</span>
+              <b id="feat-tele-susp-val" class="signal-val">{{ "%.1f"|format(f0.suspicion_score) }}%</b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- 3. FORENSIC TELEMETRY SIGNALS PANEL -->
     <section class="panel glass-card">
       <div class="panel-header">
         <div>
-          <h3>FORENSIC TELEMETRY SIGNALS</h3>
-          <p class="panel-sub">Deconstructed sequence feature activations, noise residual metrics &amp; temporal indicators</p>
+          <h3>SEQUENCE FORENSIC TELEMETRY</h3>
+          <p class="panel-sub">Deconstructed neural feature activations, multi-scale residual noise, and inter-frame motion jitter</p>
         </div>
-        <span class="hud-tag">NEURAL &amp; FREQUENCY ANALYSIS</span>
+        <span class="hud-tag">NEURAL &amp; OPTICAL ANALYSIS</span>
       </div>
 
       <div class="signals-hud-grid">
         <div class="signal-item">
           <div class="signal-label-row">
-            <span class="signal-name">ResNet18 CNN Spatial Features</span>
+            <span class="signal-name">ResNet-18 Spatial Features</span>
             <span class="signal-tag {% if result.cnn_score > 50 %}tag-fake-pill{% else %}tag-real-pill{% endif %}">
-              {% if result.cnn_score > 50 %}DEEPFAKE INDICATOR{% else %}REAL COMPATIBLE{% endif %}
+              {% if result.cnn_score > 50 %}SYNTHESIS ARTIFACTS{% else %}NATURAL OPTICS{% endif %}
             </span>
           </div>
           <div class="bar-track">
@@ -108,9 +536,9 @@
 
         <div class="signal-item">
           <div class="signal-label-row">
-            <span class="signal-name">LSTM Sequence Memory Signal</span>
+            <span class="signal-name">LSTM Temporal Memory</span>
             <span class="signal-tag {% if result.lstm_score > 50 %}tag-fake-pill{% else %}tag-real-pill{% endif %}">
-              {% if result.lstm_score > 50 %}DEEPFAKE INDICATOR{% else %}REAL COMPATIBLE{% endif %}
+              {% if result.lstm_score > 50 %}TEMPORAL WARPING{% else %}SEAMLESS CONTINUITY{% endif %}
             </span>
           </div>
           <div class="bar-track">
@@ -126,9 +554,9 @@
         {% set noise_val = result.parameters.noise_blueprint_variance if result.parameters is defined and result.parameters.noise_blueprint_variance is defined else result.average_suspicion %}
         <div class="signal-item">
           <div class="signal-label-row">
-            <span class="signal-name">Noise Blueprint Residual Variance</span>
+            <span class="signal-name">Noise Blueprint Variance</span>
             <span class="signal-tag {% if noise_val > 45 %}tag-fake-pill{% else %}tag-real-pill{% endif %}">
-              {% if noise_val > 45 %}SYNTHETIC STIPPLING{% else %}NATURAL GRAIN{% endif %}
+              {% if noise_val > 45 %}SYNTHETIC GRAIN{% else %}HARDWARE PRNU NOISE{% endif %}
             </span>
           </div>
           <div class="bar-track">
@@ -143,91 +571,107 @@
 
         <div class="signal-item">
           <div class="signal-label-row">
-            <span class="signal-name">Colour Balance &amp; HSV Residuals</span>
-            <span class="signal-tag {% if result.color_drift_score > 35 %}tag-fake-pill{% else %}tag-real-pill{% endif %}">
-              {% if result.color_drift_score > 35 %}BOUNDARY SHIFT{% else %}BALANCED OPTICS{% endif %}
+            <span class="signal-name">Inter-Frame Jitter</span>
+            <span class="signal-tag {% if result.temporal_jitter_score > 35 %}tag-fake-pill{% else %}tag-real-pill{% endif %}">
+              {% if result.temporal_jitter_score > 35 %}PHASE FLICKER{% else %}STABLE GRAIN{% endif %}
             </span>
           </div>
           <div class="bar-track">
-            <div class="bar-fill {% if result.color_drift_score > 35 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ result.color_drift_score }}%"></div>
+            <div class="bar-fill {% if result.temporal_jitter_score > 35 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ result.temporal_jitter_score }}%"></div>
           </div>
           <div class="signal-impact-row">
-            <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - result.color_drift_score) }}%</span>
-            <span class="impact-fake">Fake Impact: {{ "%.1f"|format(result.color_drift_score) }}%</span>
-            <b class="signal-val">{{ "%.1f"|format(result.color_drift_score) }}%</b>
-          </div>
-        </div>
-
-        <div class="signal-item">
-          <div class="signal-label-row">
-            <span class="signal-name">Grayscale Luminance Discrepancy</span>
-            <span class="signal-tag {% if result.temporal_inconsistency_score > 40 %}tag-fake-pill{% else %}tag-real-pill{% endif %}">
-              {% if result.temporal_inconsistency_score > 40 %}EDGE ANOMALY{% else %}UNIFORM LIGHTING{% endif %}
-            </span>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill {% if result.temporal_inconsistency_score > 40 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ result.temporal_inconsistency_score }}%"></div>
-          </div>
-          <div class="signal-impact-row">
-            <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - result.temporal_inconsistency_score) }}%</span>
-            <span class="impact-fake">Fake Impact: {{ "%.1f"|format(result.temporal_inconsistency_score) }}%</span>
-            <b class="signal-val">{{ "%.1f"|format(result.temporal_inconsistency_score) }}%</b>
-          </div>
-        </div>
-
-        {% set composite_val = result.fake_percentage if result.fake_percentage is defined else result.confidence %}
-        <div class="signal-item">
-          <div class="signal-label-row">
-            <span class="signal-name">Composite Suspicion Index</span>
-            <span class="signal-tag {% if composite_val >= 50 %}tag-fake-pill{% else %}tag-real-pill{% endif %}">
-              {% if composite_val >= 50 %}HIGH DEEPFAKE RISK{% else %}AUTHENTIC MEDIA{% endif %}
-            </span>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill {% if composite_val >= 50 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ composite_val }}%"></div>
-          </div>
-          <div class="signal-impact-row">
-            <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - composite_val) }}%</span>
-            <span class="impact-fake">Fake Impact: {{ "%.1f"|format(composite_val) }}%</span>
-            <b class="signal-val">{{ "%.1f"|format(composite_val) }}%</b>
+            <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - result.temporal_jitter_score) }}%</span>
+            <span class="impact-fake">Fake Impact: {{ "%.1f"|format(result.temporal_jitter_score) }}%</span>
+            <b class="signal-val">{{ "%.1f"|format(result.temporal_jitter_score) }}%</b>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Temporal Timeline Graph -->
-    <section class="panel glass-card timeline-section">
-      <div class="section-header-row">
+    <!-- 3. TEMPORAL FORENSICS TIMELINE -->
+    <section class="panel glass-card">
+      <div class="panel-header">
         <div>
-          <h3>TEMPORAL FORENSIC TIMELINE</h3>
-          <p class="section-desc">Frame-by-frame progression of Suspicion (Cyan), Noise Inconsistency (Yellow), and Color Drift (Red) across time.</p>
+          <h3>TEMPORAL SUSPICION TIMELINE</h3>
+          <p class="panel-sub">Frame-by-frame suspicion fluctuation across all {{ result.frame_count }} extracted sequence keyframes</p>
         </div>
-        <div class="chart-legend">
-          <span class="legend-item"><i class="dot-suspicion"></i> Suspicion</span>
-          <span class="legend-item"><i class="dot-noise"></i> Noise Blueprint</span>
-          <span class="legend-item"><i class="dot-color"></i> Color Drift</span>
+        <div class="timeline-legend">
+          <span class="legend-item"><span class="dot dot-real"></span> Real (&lt;38%)</span>
+          <span class="legend-item"><span class="dot dot-uncertain" style="background:#f4d35e;"></span> Uncertain (38-65%)</span>
+          <span class="legend-item"><span class="dot dot-fake"></span> Deepfake (&gt;65%)</span>
         </div>
       </div>
-      <div id="timeline-chart" class="timeline-chart-wrapper"></div>
+      <div id="timeline-chart" class="timeline-container">
+        <!-- Rendered via video_results.js with SVG -->
+      </div>
     </section>
 
-    <!-- Separate Frames Inspection Section -->
-    <section class="panel glass-card frames-section">
-      <div class="section-header-row">
+    <!-- 4. FRAME-LEVEL RESULTS TABLE (Full audit listing all extracted frames) -->
+    <section class="panel glass-card">
+      <div class="panel-header">
         <div>
-          <h3>SEPARATE FRAME FORENSICS</h3>
-          <p class="section-desc">Each of the {{ result.frame_count }} frames is analyzed separately with dedicated Noise Blueprint, Heatmap, and Telemetry Signals.</p>
+          <h3>FRAME-LEVEL AUDIT RESULTS</h3>
+          <p class="panel-sub">Complete telemetry listing of all {{ result.frame_count }} extracted keyframes</p>
         </div>
-        <div class="controls-toolbar">
+      </div>
+
+      <div class="frame-table-wrapper">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>FRAME #</th>
+              <th>TIMESTAMP</th>
+              <th>VERDICT</th>
+              <th>ANOMALY SCORE</th>
+              <th>NOISE VARIANCE</th>
+              <th>COLOR DRIFT</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in result.frames %}
+            <tr>
+              <td class="mono"><strong>#{{ "%02d"|format(f.number) }}</strong></td>
+              <td class="mono">{{ "%.2f"|format(f.timestamp) }}s</td>
+              <td>
+                <span class="frame-badge {% if f.frame_verdict == 'FAKE' %}badge-high{% elif f.frame_verdict == 'REAL' %}badge-low{% else %}badge-med{% endif %}">
+                  {{ f.frame_verdict }}
+                </span>
+              </td>
+              <td><strong class="mono">{{ "%.1f"|format(f.suspicion_score) }}%</strong></td>
+              <td class="mono">{{ "%.1f"|format(f.noise_score) }}%</td>
+              <td class="mono">{{ "%.1f"|format(f.color_score) }}%</td>
+              <td>
+                <button class="btn-inspect" onclick="openFrameModal({{ f.number }})" style="padding:4px 10px; font-size:0.75rem;">
+                  🔬 Inspect
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5. SEPARATE FRAME DECOMPOSITION CARDS -->
+    <section class="panel glass-card">
+      <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
+        <div>
+          <h3>SEPARATE FRAME DECOMPOSITION</h3>
+          <p class="panel-sub">Inspect individual frames with 3 independent forensic visual evidence layers in fixed order: 01 Original, 02 Noise Blueprint, 03 Heatmap</p>
+        </div>
+        <div class="controls-row">
           <div class="filter-group">
-            <button class="btn-filter active" data-filter="all">All Frames ({{ result.frame_count }})</button>
-            <button class="btn-filter" data-filter="high">Suspicious (>50%)</button>
+            <span class="filter-lbl">Filter:</span>
+            <button class="btn-filter active" data-filter="all">All ({{ result.frame_count }})</button>
+            <button class="btn-filter" data-filter="high">Suspicious Only ({{ result.suspicious_frames }})</button>
           </div>
           <div class="sort-group">
-            <select id="frame-sort" class="sort-select">
-              <option value="chrono">Order: Chronological (1 → {{ result.frame_count }})</option>
-              <option value="suspicion-desc">Order: Highest Suspicion First</option>
-              <option value="noise-desc">Order: Highest Noise Score First</option>
+            <label for="frame-sort" class="filter-lbl">Sort:</label>
+            <select id="frame-sort" class="select-cyber">
+              <option value="chrono">Chronological (Default)</option>
+              <option value="suspicion-desc">Highest Suspicion First</option>
+              <option value="noise-desc">Highest Noise Score First</option>
             </select>
           </div>
         </div>
@@ -241,108 +685,41 @@
               <h4 class="frame-num">FRAME #{{ "%02d"|format(f.number) }}</h4>
               <span class="frame-time mono">⏱️ {{ "%.2f"|format(f.timestamp) }}s</span>
             </div>
-            <div class="frame-badge {% if f.suspicion_score >= 60 %}badge-high{% elif f.suspicion_score >= 40 %}badge-med{% else %}badge-low{% endif %}">
-              Suspicion: {{ "%.1f"|format(f.suspicion_score) }}%
+            <div class="frame-badge {% if f.frame_verdict == 'FAKE' %}badge-high{% elif f.frame_verdict == 'REAL' %}badge-low{% else %}badge-med{% endif %}">
+              {{ f.frame_verdict }} ({{ "%.1f"|format(f.suspicion_score) }}%)
             </div>
           </div>
 
+          <!-- Fixed Order: 01 Original -> 02 Noise Blueprint -> 03 Heatmap (Eager rendering) -->
           <div class="frame-views-grid">
-            <figure class="thumb-fig" title="Original">
-              <img src="{{ f.original_image }}" alt="Original Frame {{ f.number }}" loading="lazy">
-              <figcaption>ORIGINAL</figcaption>
+            <figure class="thumb-fig" title="01 Original: Untouched extracted frame">
+              <img src="{{ f.original_image }}" alt="Original Frame {{ f.number }}" loading="eager">
+              <figcaption>01 ORIGINAL</figcaption>
             </figure>
-            <figure class="thumb-fig" title="Noise Blueprint: Identifies image by high-frequency noise">
-              <img src="{{ f.blueprint_image }}" alt="Noise Blueprint" loading="lazy">
-              <figcaption>NOISE BLUEPRINT</figcaption>
+            <figure class="thumb-fig" title="02 Noise Blueprint: High-frequency residual noise stippling">
+              <img src="{{ f.blueprint_image }}" alt="Noise Blueprint" loading="eager">
+              <figcaption>02 BLUEPRINT</figcaption>
             </figure>
-            <figure class="thumb-fig" title="Heatmap">
-              <img src="{{ f.heatmap_image }}" alt="Heatmap" loading="lazy">
-              <figcaption>HEATMAP</figcaption>
+            <figure class="thumb-fig" title="03 Heatmap: Thermal anomaly intensity map">
+              <img src="{{ f.heatmap_image }}" alt="Heatmap" loading="eager">
+              <figcaption>03 HEATMAP</figcaption>
             </figure>
           </div>
 
-          <!-- Per-Frame Telemetry Signals Breakdown -->
-          <div class="frame-telemetry-box" style="margin-top: 14px;">
-            <div class="signals-hud-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
-              <div class="signal-item" style="padding: 10px 12px;">
-                <div class="signal-label-row">
-                  <span class="signal-name" style="font-size:0.8rem;">Noise Blueprint</span>
-                  <span class="signal-tag {% if f.noise_score > 45 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.6rem;">
-                    {% if f.noise_score > 45 %}SYNTHETIC STIPPLING{% else %}NATURAL GRAIN{% endif %}
-                  </span>
-                </div>
-                <div class="bar-track" style="height:6px;">
-                  <div class="bar-fill {% if f.noise_score > 45 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ f.noise_score }}%"></div>
-                </div>
-                <div class="signal-impact-row" style="font-size:0.72rem;">
-                  <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - f.noise_score) }}%</span>
-                  <span class="impact-fake">Fake Impact: {{ "%.1f"|format(f.noise_score) }}%</span>
-                  <b class="signal-val">{{ "%.1f"|format(f.noise_score) }}%</b>
-                </div>
-              </div>
-
-              <div class="signal-item" style="padding: 10px 12px;">
-                <div class="signal-label-row">
-                  <span class="signal-name" style="font-size:0.8rem;">Colour &amp; HSV</span>
-                  <span class="signal-tag {% if f.color_score > 35 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.6rem;">
-                    {% if f.color_score > 35 %}BOUNDARY SHIFT{% else %}BALANCED OPTICS{% endif %}
-                  </span>
-                </div>
-                <div class="bar-track" style="height:6px;">
-                  <div class="bar-fill {% if f.color_score > 35 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ f.color_score }}%"></div>
-                </div>
-                <div class="signal-impact-row" style="font-size:0.72rem;">
-                  <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - f.color_score) }}%</span>
-                  <span class="impact-fake">Fake Impact: {{ "%.1f"|format(f.color_score) }}%</span>
-                  <b class="signal-val">{{ "%.1f"|format(f.color_score) }}%</b>
-                </div>
-              </div>
-
-              <div class="signal-item" style="padding: 10px 12px;">
-                <div class="signal-label-row">
-                  <span class="signal-name" style="font-size:0.8rem;">Grayscale Discrepancy</span>
-                  <span class="signal-tag {% if f.grayscale_score > 40 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.6rem;">
-                    {% if f.grayscale_score > 40 %}EDGE ANOMALY{% else %}UNIFORM LIGHTING{% endif %}
-                  </span>
-                </div>
-                <div class="bar-track" style="height:6px;">
-                  <div class="bar-fill {% if f.grayscale_score > 40 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ f.grayscale_score }}%"></div>
-                </div>
-                <div class="signal-impact-row" style="font-size:0.72rem;">
-                  <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - f.grayscale_score) }}%</span>
-                  <span class="impact-fake">Fake Impact: {{ "%.1f"|format(f.grayscale_score) }}%</span>
-                  <b class="signal-val">{{ "%.1f"|format(f.grayscale_score) }}%</b>
-                </div>
-              </div>
-
-              <div class="signal-item" style="padding: 10px 12px;">
-                <div class="signal-label-row">
-                  <span class="signal-name" style="font-size:0.8rem;">Frame Suspicion Index</span>
-                  <span class="signal-tag {% if f.suspicion_score >= 50 %}tag-fake-pill{% else %}tag-real-pill{% endif %}" style="font-size:0.6rem;">
-                    {% if f.suspicion_score >= 50 %}SUSPICIOUS FRAME{% else %}AUTHENTIC FRAME{% endif %}
-                  </span>
-                </div>
-                <div class="bar-track" style="height:6px;">
-                  <div class="bar-fill {% if f.suspicion_score >= 50 %}bar-fake{% else %}bar-real{% endif %}" style="width: {{ f.suspicion_score }}%"></div>
-                </div>
-                <div class="signal-impact-row" style="font-size:0.72rem;">
-                  <span class="impact-real">Real Impact: {{ "%.1f"|format(100.0 - f.suspicion_score) }}%</span>
-                  <span class="impact-fake">Fake Impact: {{ "%.1f"|format(f.suspicion_score) }}%</span>
-                  <b class="signal-val">{{ "%.1f"|format(f.suspicion_score) }}%</b>
-                </div>
-              </div>
-            </div>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="btn-inspect" onclick="selectFeaturedFrame({{ f.number }}); document.querySelector('#featured-frame-section').scrollIntoView({behavior:'smooth', block:'start'});" style="flex:1; background:rgba(0,240,255,0.12); border:1px solid var(--border-cyan); font-size:0.75rem;">
+              ⚡ Inspect in Console
+            </button>
+            <button class="btn-inspect" onclick="openFrameModal({{ f.number }})" style="flex:1; font-size:0.75rem;">
+              🔬 Full Screen
+            </button>
           </div>
-
-          <button class="btn-inspect" onclick="openFrameModal({{ f.number }})" style="margin-top: 14px;">
-            🔬 Inspect Frame {{ f.number }} in Full View
-          </button>
         </article>
         {% endfor %}
       </div>
     </section>
 
-    <!-- Full Screen Separate Frame Inspector Modal -->
+    <!-- 6. FULL-SCREEN SEPARATE FRAME INSPECTOR MODAL WITH COMPARISON SLIDER -->
     <div id="inspector-modal" class="modal-backdrop" hidden>
       <div class="modal-dialog">
         <header class="modal-header">
@@ -355,41 +732,63 @@
 
         <div class="modal-nav-row">
           <button id="modal-prev-btn" class="btn-nav">← Previous Frame</button>
+          <!-- Navigation Tabs -->
           <div class="modal-tabs">
-            <button class="modal-tab active" data-tab="blueprint">Noise Blueprint</button>
-            <button class="modal-tab" data-tab="original">Original</button>
-            <button class="modal-tab" data-tab="heatmap">Heatmap</button>
-            <button class="modal-tab" data-tab="side-by-side">Side-by-Side (3-Way)</button>
+            <button class="modal-tab active" data-tab="original">01 Original</button>
+            <button class="modal-tab" data-tab="blueprint">02 Noise Blueprint</button>
+            <button class="modal-tab" data-tab="heatmap">03 Heatmap</button>
+            <button class="modal-tab" data-tab="slider">↔ Interactive Slider</button>
+            <button class="modal-tab" data-tab="side-by-side">3-Way Side-by-Side</button>
           </div>
           <button id="modal-next-btn" class="btn-nav">Next Frame →</button>
         </div>
 
         <div class="modal-body">
+          <!-- Single View Layer -->
           <div id="modal-single-view" class="modal-single-view">
             <img id="modal-active-img" src="" alt="Frame inspection preview">
             <p id="modal-view-caption" class="view-caption"></p>
           </div>
 
-          <div id="modal-compare-view" class="modal-compare-grid-3" hidden>
+          <!-- Interactive Before/After Comparison Slider Layer -->
+          <div id="modal-slider-view" hidden style="display:none; margin-bottom:16px;">
+            <div style="display:flex; justify-content:center; gap:12px; margin-bottom:10px;">
+              <span style="font-size:0.8rem; color:var(--text-muted); align-self:center;">Compare Original with:</span>
+              <button id="slider-mode-blueprint" class="btn-filter active" style="font-size:0.75rem; padding:4px 10px;">Noise Blueprint</button>
+              <button id="slider-mode-heatmap" class="btn-filter" style="font-size:0.75rem; padding:4px 10px;">Thermal Heatmap</button>
+            </div>
+            <div class="slider-comparison-box" id="slider-box">
+              <!-- Layer 1 (Background): Target Filter Image -->
+              <img id="slider-target-img" class="slider-img-target" src="" alt="Comparison Target">
+              <!-- Layer 2 (Foreground): 100% UNTOUCHED RAW ORIGINAL FRAME -->
+              <img id="slider-orig-img" class="slider-img-orig" src="" alt="Untouched Original">
+              <div class="slider-handle-bar" id="slider-handle"></div>
+              <div class="slider-handle-button" id="slider-handle-btn">↔</div>
+              <input type="range" min="0" max="100" value="50" class="slider-range-input" id="slider-range" aria-label="Modal forensic wiper slider">
+            </div>
+            <p style="text-align:center; font-family:var(--font-mono); font-size:0.78rem; color:var(--cyan); margin-top:8px;">
+              ◀ Drag slider left/right to reveal untouched original frame vs forensic overlay ▶
+            </p>
+          </div>
+
+          <!-- 3-Way Side-by-Side View -->
+          <div id="modal-compare-view" class="modal-compare-grid-3" hidden style="display:none;">
             <figure>
-              <figcaption>ORIGINAL</figcaption>
+              <figcaption>01 ORIGINAL (UNTOUCHED RAW FRAME)</figcaption>
               <img id="modal-comp-original" src="" alt="Original">
             </figure>
             <figure>
-              <figcaption>NOISE BLUEPRINT</figcaption>
+              <figcaption>02 NOISE BLUEPRINT</figcaption>
               <img id="modal-comp-blueprint" src="" alt="Noise Blueprint">
             </figure>
             <figure>
-              <figcaption>HEATMAP</figcaption>
+              <figcaption>03 HEATMAP</figcaption>
               <img id="modal-comp-heatmap" src="" alt="Heatmap">
             </figure>
           </div>
 
           <div class="modal-metrics-footer">
-            <div class="modal-metric"><span>Suspicion Index:</span> <strong id="modal-stat-suspicion">—</strong></div>
-            <div class="modal-metric"><span>Noise Blueprint Score:</span> <strong id="modal-stat-noise">—</strong></div>
-            <div class="modal-metric"><span>Color Drift:</span> <strong id="modal-stat-color">—</strong></div>
-            <div class="modal-metric"><span>Grayscale Inconsistency:</span> <strong id="modal-stat-grayscale">—</strong></div>
+            <!-- Populated dynamically via JS -->
           </div>
         </div>
       </div>
@@ -397,10 +796,8 @@
   </main>
 
   <script>
-    // Embed serialized report data for client-side interactivity
     const VIDEO_DATA = {{ result | tojson }};
   </script>
   <script src="{{ url_for('static', filename='video_results.js') }}"></script>
 </body>
 </html>
-

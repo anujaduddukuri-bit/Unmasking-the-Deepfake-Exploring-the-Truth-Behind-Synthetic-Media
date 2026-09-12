@@ -29,6 +29,10 @@ results/*
 *.h5
 
 
+# Datasets
+dataset/
+data/
+
 # IDE / OS junk
 .DS_Store
 Thumbs.db

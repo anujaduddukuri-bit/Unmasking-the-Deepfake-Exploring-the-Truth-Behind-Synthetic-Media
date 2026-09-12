@@ -3,30 +3,123 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Unmasking the Deepfake | Forensic Media Analysis Hub</title>
+  <title>Unmasking Deepfake | Single Image Forensic Lab</title>
+  <meta name="description" content="Upload any image to detect deepfake manipulation using AI forensic analysis — Noise Blueprint, Heatmap, and neural confidence scoring.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://unmasking-deepfake.vercel.app/image">
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Unmasking Deepfake | Single Image Forensic Lab">
+  <meta property="og:description" content="Detect deepfake images with AI forensics: Noise Blueprint, Heatmap, ResNet18-LSTM confidence.">
+  <meta property="og:image"       content="{{ url_for('static', filename='logo.png') }}">
+
+  <!-- Favicon -->
+  <link rel="icon"             type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon"             type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <link rel="icon"             type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180"  href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <meta name="theme-color" content="#020617">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Image Comparison Slider Widget Styles */
+    .slider-comparison-box {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      height: 440px;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--border-cyan);
+      user-select: none;
+      background: #000;
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.15);
+    }
+    .slider-img-target,
+    .slider-img-orig {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    .slider-img-target {
+      z-index: 1;
+    }
+    .slider-img-orig {
+      z-index: 2;
+      clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+      filter: none !important;
+    }
+    .slider-handle-bar {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 4px;
+      height: 100%;
+      background: var(--cyan);
+      z-index: 3;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .slider-handle-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #020617;
+      border: 2px solid var(--cyan);
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.9);
+      font-size: 0.95rem;
+      font-weight: bold;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .slider-range-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: ew-resize;
+      z-index: 5;
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
   <div class="app-background"></div>
   <main class="main-container">
     <header class="hero-header">
       <div class="header-logo-container" style="display:flex; justify-content:center; align-items:center; margin-bottom:12px;">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width:64px; height:64px; border-radius:50%; border:2px solid #00f0ff; box-shadow:0 0 20px rgba(0,240,255,0.4);">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width:68px; height:68px; border-radius:50%; border:2px solid #00f0ff; box-shadow:0 0 22px rgba(0,240,255,0.45);">
       </div>
       <div class="header-badge-row">
         <span class="cyber-badge"><i class="glow-dot"></i> FORENSIC AI DETECTOR</span>
-        <span class="tech-pill">RESNET18-LSTM · ONNX RUNTIME</span>
+        <span class="tech-pill">RESNET-18 · ONNX RUNTIME · SAND NOISE BLUEPRINT</span>
       </div>
       <h1 class="main-title">UNMASKING THE DEEPFAKE</h1>
-      <p class="main-subtitle">Exposing Synthetic Media through Neural Feature Sequences & Multi-Scale Noise Residuals</p>
+      <p class="main-subtitle">Exposing Synthetic Media through Neural Feature Sequences &amp; Multi-Scale Noise Residuals</p>
       
       <nav class="nav-bar">
-        <a href="{{ url_for('welcome') }}" class="nav-item nav-link">← Welcome Page</a>
+        <a href="{{ url_for('welcome') }}" class="nav-item nav-link">← Welcome</a>
         <span class="nav-item active">Single Image Lab</span>
-        <a href="{{ url_for('video') }}" class="nav-item nav-link">Video Frame Lab <span class="arrow">→</span></a>
+        <a href="{{ url_for('video') }}"  class="nav-item nav-link">Video Frame Lab →</a>
+        <a href="{{ url_for('about') }}"  class="nav-item nav-link">How It Works</a>
       </nav>
     </header>
 
@@ -56,14 +149,15 @@
       <!-- Hero Verdict Dashboard Banner -->
       <div id="verdict-banner" class="verdict-card glass-card">
         <div class="verdict-top-bar">
-          <div id="engine-badge" class="engine-tag">Engine: ONNX Runtime v1.29</div>
+          <div id="engine-badge" class="engine-tag">Engine: ONNX Runtime</div>
           <span id="scan-status" class="scan-status-pill">● INTEGRITY SCAN VERIFIED</span>
         </div>
 
         <div class="verdict-hero-grid">
           <div class="verdict-main-box">
-            <p id="verdict-label" class="verdict-eyebrow">NEURAL & NOISE VERDICT</p>
+            <p id="verdict-label" class="verdict-eyebrow">PRIMARY FORENSIC VERDICT</p>
             <h2 id="verdict" class="verdict-headline">—</h2>
+            <p id="verdict-detail" class="verdict-detail-text" style="margin-bottom:14px;"></p>
             
             <div class="percentage-split-bar">
               <div class="percentage-pill pill-real">
@@ -75,7 +169,6 @@
                 <strong id="fake-pct" class="pct-num">—%</strong>
               </div>
             </div>
-
             <p id="verdict-expl" class="verdict-summary">—</p>
           </div>
 
@@ -101,17 +194,46 @@
             <h3>FORENSIC TELEMETRY SIGNALS</h3>
             <p class="panel-sub">Deconstructed visual feature activations and sensor noise metrics</p>
           </div>
-          <span class="hud-tag">NEURAL & FREQUENCY ANALYSIS</span>
+          <span class="hud-tag">NEURAL &amp; FREQUENCY ANALYSIS</span>
         </div>
         <div id="signals" class="signals-hud-grid"></div>
       </section>
 
-      <!-- 3-Way Comparative Evidence Suite -->
-      <section class="panel glass-card">
+      <!-- Interactive Before/After Forensic Wiper Slider Widget (Requirement 1) -->
+      <section class="panel glass-card" style="margin-top:24px;">
+        <div class="panel-header">
+          <div>
+            <h3>INTERACTIVE FORENSIC COMPARISON SLIDER</h3>
+            <p class="panel-sub">Slide horizontally to inspect the pure untouched original image vs forensic anomaly layers</p>
+          </div>
+          <div class="controls-row">
+            <button id="img-slider-mode-blueprint" class="btn-filter active">↔ Original vs Noise Blueprint</button>
+            <button id="img-slider-mode-heatmap" class="btn-filter">↔ Original vs Heatmap</button>
+          </div>
+        </div>
+
+        <div class="slider-comparison-box" id="img-slider-box">
+          <!-- Layer 1 (Background): Forensic Anomaly Overlay -->
+          <img id="img-slider-target" class="slider-img-target" src="" alt="Forensic Overlay">
+          <!-- Layer 2 (Foreground): 100% UNTOUCHED RAW ORIGINAL IMAGE -->
+          <img id="img-slider-orig" class="slider-img-orig" src="" alt="Untouched Original Image">
+          <!-- Wiper Handle -->
+          <div class="slider-handle-bar" id="img-slider-handle"></div>
+          <div class="slider-handle-button" id="img-slider-btn">↔</div>
+          <input type="range" min="0" max="100" value="50" class="slider-range-input" id="img-slider-range" aria-label="Forensic wiper slider">
+        </div>
+        <div style="display:flex; justify-content:space-between; max-width:800px; margin:10px auto 0; font-family:var(--font-mono); font-size:0.8rem;">
+          <span style="color:var(--emerald);">◀ 100% UNTOUCHED ORIGINAL (SLIDE LEFT)</span>
+          <span style="color:var(--cyan);">FORENSIC ANOMALY LAYER (SLIDE RIGHT) ▶</span>
+        </div>
+      </section>
+
+      <!-- 3-Way Comparative Evidence Suite — ORDER: 01 Original → 02 Noise Blueprint → 03 Heatmap -->
+      <section class="panel glass-card" style="margin-top:24px;">
         <div class="panel-header">
           <div>
             <h3>COMPARATIVE FORENSIC EVIDENCE SUITE</h3>
-            <p class="panel-sub">Side-by-side decomposition of input media, Noise Blueprint, and Heatmap</p>
+            <p class="panel-sub">Fixed layer order: 01 Original → 02 Noise Blueprint → 03 Heatmap</p>
           </div>
           <span class="hud-tag">TRIPLE EVIDENCE MATRIX</span>
         </div>
@@ -125,7 +247,7 @@
             <div class="img-wrapper">
               <img id="original" alt="Original uploaded target image">
             </div>
-            <div class="card-footer">Native RGB pixels analyzed at input resolution</div>
+            <div class="card-footer">Native RGB pixels — untouched uploaded image</div>
           </figure>
 
           <figure class="evidence-card blueprint-card">
@@ -147,30 +269,33 @@
             <div class="img-wrapper">
               <img id="heatmap" alt="Heatmap">
             </div>
-            <div class="card-footer">Jet Thermal Map: Blue = Natural, Yellow = Elevated, Red = Anomaly Hotspot</div>
+            <div class="card-footer">Jet Thermal Map: Blue = Natural, Yellow = Elevated, Red = Anomaly</div>
           </figure>
         </div>
       </section>
 
       <!-- Architecture Technical Details -->
-      <section class="panel glass-card explanation-panel">
+      <section class="panel glass-card explanation-panel" style="margin-top:24px;">
         <h3>DEEP FORENSIC ARCHITECTURE</h3>
         <div class="expl-grid-3">
           <div class="expl-card">
             <div class="expl-icon">📐</div>
             <h4>Noise Blueprint</h4>
-            <p>Decomposes multi-scale high-frequency noise residuals (median filter diff, Gaussian high-pass, and Laplacian response) into granular sand stippling on an architectural navy blueprint canvas (#030a16), exposing generative diffusion/GAN seams and noise inconsistencies.</p>
+            <p>Decomposes multi-scale high-frequency noise residuals (median filter diff, Gaussian high-pass, Laplacian response) into granular sand stippling on a navy blueprint canvas, exposing generative diffusion/GAN seams.</p>
           </div>
           <div class="expl-card">
             <div class="expl-icon">🧠</div>
-            <h4>ResNet18-LSTM Model (ONNX Engine)</h4>
-            <p>Extracts 512-dimensional spatial visual features through a fine-tuned ResNet-18 convolutional backbone into a 256-unit LSTM sequence network, evaluated using optimized cross-platform ONNX Runtime.</p>
+            <h4>ResNet18-LSTM Model</h4>
+            <p>Extracts 512-dimensional spatial visual features through a fine-tuned ResNet-18 backbone into a 256-unit LSTM sequence network, evaluated with ONNX Runtime.</p>
           </div>
           <div class="expl-card">
             <div class="expl-icon">🔬</div>
             <h4>Multi-Signal Forensic Telemetry</h4>
-            <p>Evaluates LAB colour residual variation, HSV saturation shifts, Laplacian edge variance, and luminance consistency maps to identify localized manipulation boundaries.</p>
+            <p>Evaluates LAB colour residuals, HSV saturation shifts, Laplacian edge variance, and luminance consistency maps to identify localized manipulation boundaries.</p>
           </div>
+        </div>
+        <div style="text-align:center; margin-top:24px;">
+          <a href="{{ url_for('about') }}" style="color:var(--cyan,#00f0ff); text-decoration:none; font-size:0.92rem; font-weight:600;">ℹ️ Full explanation of how analysis works →</a>
         </div>
       </section>
     </section>
@@ -179,5 +304,3 @@
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
-

@@ -38,11 +38,7 @@ def ensure_directories():
             path.mkdir(parents=True, exist_ok=True)
         except (OSError, PermissionError):
             pass
-    try:
-        (DATASET_DIR / "real").mkdir(parents=True, exist_ok=True)
-        (DATASET_DIR / "fake").mkdir(parents=True, exist_ok=True)
-    except (OSError, PermissionError):
-        pass
+
 
 def set_seed(seed=42):
     random.seed(seed)

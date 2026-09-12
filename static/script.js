@@ -4,6 +4,62 @@ const preview = document.querySelector('#preview');
 const button = document.querySelector('#analyze');
 const status = document.querySelector('#status');
 
+// Image Comparison Slider elements
+let currentImgSliderMode = 'blueprint'; // 'blueprint' or 'heatmap'
+let cachedAnalysisResult = null;
+
+const imgSliderRange = document.querySelector('#img-slider-range');
+const imgSliderHandle = document.querySelector('#img-slider-handle');
+const imgSliderBtn = document.querySelector('#img-slider-btn');
+const imgSliderOrig = document.querySelector('#img-slider-orig');
+const imgSliderTarget = document.querySelector('#img-slider-target');
+const btnModeBlueprint = document.querySelector('#img-slider-mode-blueprint');
+const btnModeHeatmap = document.querySelector('#img-slider-mode-heatmap');
+
+function setImgSliderPosition(val) {
+  if (imgSliderOrig) {
+    imgSliderOrig.style.clipPath = `polygon(0 0, ${val}% 0, ${val}% 100%, 0 100%)`;
+  }
+  if (imgSliderHandle) imgSliderHandle.style.left = val + '%';
+  if (imgSliderBtn) imgSliderBtn.style.left = val + '%';
+}
+
+function updateSliderImages() {
+  if (!cachedAnalysisResult) return;
+  if (imgSliderOrig) {
+    // 100% UNTOUCHED RAW ORIGINAL IMAGE
+    imgSliderOrig.src = cachedAnalysisResult.original_image;
+  }
+  if (imgSliderTarget) {
+    imgSliderTarget.src = currentImgSliderMode === 'blueprint'
+      ? cachedAnalysisResult.blueprint_image
+      : cachedAnalysisResult.heatmap_image;
+  }
+  setImgSliderPosition(imgSliderRange ? imgSliderRange.value : 50);
+}
+
+if (imgSliderRange) {
+  imgSliderRange.addEventListener('input', () => {
+    setImgSliderPosition(imgSliderRange.value);
+  });
+}
+
+if (btnModeBlueprint && btnModeHeatmap) {
+  btnModeBlueprint.addEventListener('click', () => {
+    currentImgSliderMode = 'blueprint';
+    btnModeBlueprint.classList.add('active');
+    btnModeHeatmap.classList.remove('active');
+    updateSliderImages();
+  });
+
+  btnModeHeatmap.addEventListener('click', () => {
+    currentImgSliderMode = 'heatmap';
+    btnModeHeatmap.classList.add('active');
+    btnModeBlueprint.classList.remove('active');
+    updateSliderImages();
+  });
+}
+
 function choose(file) {
   if (!file) return;
   fileInput._file = file;
@@ -11,7 +67,7 @@ function choose(file) {
   const wrapper = document.querySelector('#preview-wrapper');
   if (wrapper) wrapper.hidden = false;
   button.disabled = false;
-  status.textContent = 'Target acquired: ' + file.name;
+  status.textContent = 'Target acquired: ' + file.name + ' — Ready for deep forensic scan.';
 }
 
 fileInput.addEventListener('change', () => choose(fileInput.files[0]));
@@ -27,15 +83,17 @@ button.addEventListener('click', async () => {
   const file = fileInput._file || fileInput.files[0];
   if (!file) return;
   button.disabled = true;
-  status.textContent = 'Executing ONNX ResNet-LSTM feature extraction & Noise Blueprint decomposition…';
+  status.textContent = 'Executing ONNX feature extraction & Noise Blueprint decomposition…';
   const data = new FormData();
   data.append('file', file);
   try {
     const response = await fetch('/analyze', { method: 'POST', body: data });
     const r = await response.json();
     if (!response.ok) throw Error(r.error || 'Analysis failed');
+    cachedAnalysisResult = r;
     render(r);
-    status.textContent = 'Forensic scan complete. Sequence verified.';
+    updateSliderImages();
+    status.textContent = 'Forensic scan complete. Evidence generated in order: 01 Original, 02 Noise Blueprint, 03 Heatmap.';
   } catch (error) {
     status.textContent = 'Scan error: ' + error.message;
   } finally {
@@ -46,7 +104,6 @@ button.addEventListener('click', async () => {
 function render(r) {
   const resultsSec = document.querySelector('#results');
   resultsSec.hidden = false;
-  const demo = r.demonstration_mode;
   
   const engineBadge = document.querySelector('#engine-badge');
   if (engineBadge) {
@@ -58,23 +115,27 @@ function render(r) {
   const verdictExpl = document.querySelector('#verdict-expl');
   const scanStatus = document.querySelector('#scan-status');
 
-  verdictBanner.classList.remove('verdict-banner-fake', 'verdict-banner-real', 'verdict-banner-demo');
+  verdictBanner.classList.remove('verdict-banner-fake', 'verdict-banner-real', 'verdict-banner-demo', 'verdict-banner-uncertain');
 
-  if (demo) {
-    verdict.textContent = 'DEMONSTRATION MODE';
-    verdictBanner.classList.add('verdict-banner-demo');
-    verdictExpl.textContent = 'Forensic heuristic signals calculated. Model weights pending.';
-    if (scanStatus) scanStatus.textContent = '● FORENSIC HEURISTIC MODE';
-  } else if (r.prediction === 'DEEPFAKE') {
-    verdict.textContent = 'DEEPFAKE DETECTED';
-    verdictBanner.classList.add('verdict-banner-fake');
-    verdictExpl.textContent = 'High probability of facial synthesis or generative manipulation detected across neural feature and noise signatures.';
-    if (scanStatus) scanStatus.textContent = '▲ CRITICAL: MANIPULATION FOUND';
-  } else {
-    verdict.textContent = 'REAL / AUTHENTIC MEDIA';
+  // Exact requested wording:
+  // - VERIFIED AUTHENTIC MEDIA — REAL
+  // - VERIFIED AUTHENTIC MEDIA — FAKE
+  // - AUTHENTICITY COULD NOT BE VERIFIED
+  const verdictText = r.overall_verdict_text || (
+    r.prediction === 'REAL' ? 'VERIFIED AUTHENTIC MEDIA — REAL' : 'DEEPFAKE DETECTED — FAKE'
+  );
+
+  verdict.textContent = verdictText;
+
+  if (r.prediction === 'REAL') {
     verdictBanner.classList.add('verdict-banner-real');
-    verdictExpl.textContent = 'Visual features, frequency distributions, and sensor noise consistency align with authentic camera capture.';
-    if (scanStatus) scanStatus.textContent = '✓ VERIFIED AUTHENTIC';
+    verdictExpl.textContent = 'Spatial facial landmarks, high-frequency PRNU noise distribution, and optical chromatic balance match authentic hardware sensor capture.';
+    if (scanStatus) scanStatus.textContent = '✓ VERIFIED AUTHENTIC MEDIA';
+  } else {
+    // FAKE (or any non-REAL — no uncertain/yellow state)
+    verdictBanner.classList.add('verdict-banner-fake');
+    verdictExpl.textContent = 'Generative synthesis boundaries, residual noise anomalies, and neural feature irregularities confirm deepfake manipulation.';
+    if (scanStatus) scanStatus.textContent = '▲ CRITICAL: DEEPFAKE CONFIRMED';
   }
 
   // Update Real vs Fake percentages
@@ -86,7 +147,7 @@ function render(r) {
   // Update confidence text
   const confVal = r.confidence;
   document.querySelector('#confidence').textContent = confVal.toFixed(1) + '%';
-  document.querySelector('#confidence-label').textContent = demo ? 'EVIDENCE INTENSITY' : 'AI CONFIDENCE';
+  document.querySelector('#confidence-label').textContent = 'AI CONFIDENCE';
 
   // Animate SVG circular gauge
   const gaugeFill = document.querySelector('#gauge-fill');
@@ -97,7 +158,7 @@ function render(r) {
     gaugeFill.style.strokeDasharray = `${circumference}`;
     gaugeFill.style.strokeDashoffset = `${offset}`;
     
-    if (r.prediction === 'DEEPFAKE') {
+    if (r.prediction === 'FAKE') {
       gaugeFill.style.stroke = '#ff2a5f';
     } else if (r.prediction === 'REAL') {
       gaugeFill.style.stroke = '#00ff87';
@@ -106,28 +167,30 @@ function render(r) {
     }
   }
 
-  // Signals telemetry & Parameter breakdown for Real % vs Fake %
+  // Signals telemetry
   const signals = [
-    ['ResNet18 CNN Spatial Features', r.cnn_score, r.cnn_score > 50 ? 'DEEPFAKE INDICATOR' : 'REAL COMPATIBLE'],
-    ['LSTM Sequence Memory Signal', r.lstm_score, r.lstm_score > 50 ? 'DEEPFAKE INDICATOR' : 'REAL COMPATIBLE'],
-    ['Noise Blueprint Residual Variance', r.noise_score, r.noise_score > 45 ? 'SYNTHETIC STIPPLING' : 'NATURAL GRAIN'],
+    ['ResNet18 CNN Spatial Features', r.cnn_score, r.cnn_score > 50 ? 'SYNTHESIS ARTIFACT' : 'NATURAL OPTICS'],
+    ['LSTM Sequence Feature Signal', r.lstm_score, r.lstm_score > 50 ? 'SEQUENCE ANOMALY' : 'CONSISTENT OPTICS'],
+    ['Noise Blueprint Variance', r.noise_score, r.noise_score > 45 ? 'SYNTHETIC STIPPLING' : 'NATURAL SENSOR GRAIN'],
     ['Colour Balance & HSV Residuals', r.color_score, r.color_score > 35 ? 'BOUNDARY SHIFT' : 'BALANCED OPTICS'],
     ['Grayscale Luminance Discrepancy', r.grayscale_score, r.grayscale_score > 40 ? 'EDGE ANOMALY' : 'UNIFORM LIGHTING'],
-    ['Composite Suspicion Index', r.suspicion_score, r.suspicion_score >= 50 ? 'HIGH DEEPFAKE RISK' : 'AUTHENTIC MEDIA']
+    ['Composite Suspicion Index', r.suspicion_score, r.suspicion_score >= 60 ? 'HIGH MANIPULATION RISK' : (r.suspicion_score >= 38 ? 'INTERMEDIATE ZONE' : 'AUTHENTIC MEDIA')]
   ];
 
   document.querySelector('#signals').innerHTML = signals.map(([name, value, statusTag]) => {
     const realImpact = (100 - value).toFixed(1);
     const fakeImpact = value.toFixed(1);
-    const isFakeTag = statusTag.includes('DEEPFAKE') || statusTag.includes('SYNTHETIC') || statusTag.includes('SHIFT') || statusTag.includes('ANOMALY');
+    const isFakeTag = statusTag.includes('MANIPULATION') || statusTag.includes('SYNTHESIS') || statusTag.includes('SYNTHETIC') || statusTag.includes('SHIFT') || statusTag.includes('ANOMALY');
+    const isUncertainTag = statusTag.includes('INTERMEDIATE');
+    const pillClass = isFakeTag ? 'tag-fake-pill' : (isUncertainTag ? 'tag-uncertain-pill' : 'tag-real-pill');
     return `
       <div class="signal-item">
         <div class="signal-label-row">
           <span class="signal-name">${name}</span>
-          <span class="signal-tag ${isFakeTag ? 'tag-fake-pill' : 'tag-real-pill'}">${statusTag}</span>
+          <span class="signal-tag ${pillClass}">${statusTag}</span>
         </div>
         <div class="bar-track">
-          <div class="bar-fill ${value > 50 ? 'bar-fake' : 'bar-real'}" style="width:${Math.min(value, 100)}%"></div>
+          <div class="bar-fill ${value > 50 ? 'bar-fake' : (value > 38 ? 'bar-uncertain' : 'bar-real')}" style="width:${Math.min(value, 100)}%"></div>
         </div>
         <div class="signal-impact-row">
           <span class="impact-real">Real Impact: ${realImpact}%</span>
@@ -138,11 +201,10 @@ function render(r) {
     `;
   }).join('');
 
-  // 3-Way Comparative Evidence Suite (No overlays)
+  // 3-Way Comparative Evidence Suite in strict order: 01 Original -> 02 Noise Blueprint -> 03 Heatmap
   document.querySelector('#original').src = r.original_image;
   document.querySelector('#blueprint').src = r.blueprint_image;
   document.querySelector('#heatmap').src = r.heatmap_image;
 
   resultsSec.scrollIntoView({ behavior: 'smooth' });
 }
-

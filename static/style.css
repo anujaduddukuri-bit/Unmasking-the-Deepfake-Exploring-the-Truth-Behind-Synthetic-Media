@@ -32,6 +32,10 @@
   padding: 0;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html, body {
   min-height: 100vh;
   background-color: var(--bg-dark);
@@ -1202,10 +1206,18 @@ html, body {
   display: inline-block;
 }
 
+.view-caption:empty {
+  display: none !important;
+}
+
 .modal-compare-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+}
+
+.modal-compare-grid-3[hidden] {
+  display: none !important;
 }
 
 .modal-compare-grid-3 figure {
@@ -1418,4 +1430,73 @@ html, body {
   border-color: var(--cyan);
   color: #ffffff;
 }
+
+/* ==========================================================================
+   CALIBRATION & UNCERTAIN ZONE PRODUCTION STYLES
+   ========================================================================== */
+
+.verdict-banner-uncertain {
+  border-color: rgba(244, 211, 94, 0.5) !important;
+  background: linear-gradient(135deg, rgba(244, 211, 94, 0.12) 0%, rgba(11, 19, 41, 0.9) 100%) !important;
+  box-shadow: 0 0 35px rgba(244, 211, 94, 0.18) !important;
+}
+
+.verdict-title.verdict-uncertain {
+  color: var(--gold, #f4d35e);
+  text-shadow: 0 0 25px rgba(244, 211, 94, 0.6);
+}
+
+.pill-uncertain {
+  background: rgba(244, 211, 94, 0.15);
+  border: 1px solid rgba(244, 211, 94, 0.4);
+  color: #fef08a;
+}
+
+.dot-uncertain {
+  background: var(--gold, #f4d35e);
+  box-shadow: 0 0 8px #f4d35e;
+}
+
+.text-emerald {
+  color: var(--emerald, #00ff87) !important;
+}
+
+.text-gold {
+  color: var(--gold, #f4d35e) !important;
+}
+
+.text-crimson {
+  color: var(--crimson, #ff2a5f) !important;
+}
+
+.tag-uncertain-pill {
+  background: rgba(244, 211, 94, 0.15);
+  color: #fef08a;
+  border: 1px solid rgba(244, 211, 94, 0.4);
+}
+
+.bar-uncertain {
+  background: linear-gradient(90deg, #f4d35e, #fbbf24);
+  box-shadow: 0 0 10px rgba(244, 211, 94, 0.6);
+}
+
+/* Modal tab active state for Original */
+.modal-tab[data-tab="original"].active {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+}
+
+/* Smooth highlight pulse for jumping to frame card */
+@keyframes highlightPulse {
+  0%   { box-shadow: 0 0 0px rgba(0, 240, 255, 0); }
+  50%  { box-shadow: 0 0 30px rgba(0, 240, 255, 0.7); border-color: #00f0ff; }
+  100% { box-shadow: 0 0 0px rgba(0, 240, 255, 0); }
+}
+
+.highlight-pulse {
+  animation: highlightPulse 1.8s ease-in-out;
+}
+
 

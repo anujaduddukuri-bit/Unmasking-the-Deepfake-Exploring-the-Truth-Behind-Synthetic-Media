@@ -3,7 +3,47 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Unmasking the Deepfake | AI Forensic System</title>
+  <title>Unmasking Deepfake | AI Forensic Media Verification</title>
+  <meta name="description" content="Unmasking Deepfake — AI-powered forensic platform to detect synthetic and manipulated images and videos using ResNet18-LSTM neural networks, Noise Blueprint, and temporal analysis.">
+  <meta name="keywords" content="deepfake detector, AI forensics, image authentication, video verification, fake media, synthetic media detection">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://unmasking-deepfake.vercel.app/">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Unmasking Deepfake | AI Forensic Media Verification">
+  <meta property="og:description" content="Detect deepfakes and synthetic media with AI-powered forensic analysis. ResNet18-LSTM, Noise Blueprint, and temporal frame analysis.">
+  <meta property="og:url"         content="https://unmasking-deepfake.vercel.app/">
+  <meta property="og:image"       content="{{ url_for('static', filename='logo.png') }}">
+  <meta property="og:site_name"   content="Unmasking Deepfake">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="Unmasking Deepfake | AI Forensic Media Verification">
+  <meta name="twitter:description" content="Detect deepfakes with neural AI forensics. Analyze images and videos instantly.">
+  <meta name="twitter:image"       content="{{ url_for('static', filename='logo.png') }}">
+
+  <!-- Favicon -->
+  <link rel="icon"             type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon"             type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <link rel="icon"             type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180"  href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <meta name="theme-color" content="#020617">
+
+  <!-- Schema.org structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Unmasking Deepfake",
+    "url": "https://unmasking-deepfake.vercel.app/",
+    "description": "AI-powered forensic detection platform for deepfake images and videos.",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "All",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -24,15 +64,9 @@
     }
 
     /* Animated radar rings */
-    .radar-rings {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
+    .radar-rings { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
     .radar-ring {
-      position: absolute;
-      left: 50%; top: 50%;
+      position: absolute; left: 50%; top: 50%;
       transform: translate(-50%, -50%);
       border-radius: 50%;
       border: 1px solid rgba(0,240,255,0.08);
@@ -47,31 +81,19 @@
       100% { opacity: 0;   transform: translate(-50%,-50%) scale(1.1); }
     }
 
-    /* Glitch scan line */
     .scan-line {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      position: fixed; top: 0; left: 0; right: 0;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--cyan, #00f0ff), transparent);
       animation: scan 6s linear infinite;
-      pointer-events: none;
-      z-index: 100;
-      opacity: 0.4;
+      pointer-events: none; z-index: 100; opacity: 0.4;
     }
     @keyframes scan { from { top: 0; } to { top: 100vh; } }
 
     /* Hero logo */
-    .hero-logo-wrap {
-      position: relative;
-      width: 140px;
-      height: 140px;
-      margin: 0 auto 28px;
-    }
+    .hero-logo-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 28px; }
     .hero-logo-wrap::before {
-      content: '';
-      position: absolute;
-      inset: -10px;
-      border-radius: 50%;
+      content: ''; position: absolute; inset: -10px; border-radius: 50%;
       background: radial-gradient(circle, rgba(0,240,255,0.15) 0%, transparent 70%);
       animation: pulse-glow 2.5s ease-in-out infinite;
     }
@@ -80,187 +102,90 @@
       50%       { transform: scale(1.12); opacity: 1; }
     }
     .hero-logo-wrap img {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
+      width: 140px; height: 140px; border-radius: 50%;
       border: 2px solid rgba(0,240,255,0.4);
       box-shadow: 0 0 40px rgba(0,240,255,0.3), 0 0 80px rgba(0,240,255,0.1);
     }
 
-    /* Hero headline */
     .hero-eyebrow {
-      font-family: var(--font-mono, monospace);
-      font-size: 0.75rem;
-      letter-spacing: 0.22em;
-      color: var(--cyan, #00f0ff);
-      margin-bottom: 12px;
-      text-transform: uppercase;
+      font-family: var(--font-mono, monospace); font-size: 0.75rem;
+      letter-spacing: 0.22em; color: var(--cyan, #00f0ff);
+      margin-bottom: 12px; text-transform: uppercase;
     }
     .hero-title {
       font-family: var(--font-heading, sans-serif);
-      font-size: clamp(2.2rem, 6vw, 4.2rem);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
+      font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 900;
+      line-height: 1.05; letter-spacing: -0.02em;
       background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 40%, #00f0ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       margin-bottom: 12px;
     }
-    .hero-underline {
-      width: 80px;
-      height: 3px;
-      background: var(--cyan, #00f0ff);
-      border-radius: 2px;
-      margin: 0 auto 20px;
-    }
-    .hero-desc {
-      max-width: 680px;
-      font-size: 1.05rem;
-      line-height: 1.7;
-      color: rgba(200,210,240,0.75);
-      margin: 0 auto 36px;
-    }
+    .hero-underline { width: 80px; height: 3px; background: var(--cyan, #00f0ff); border-radius: 2px; margin: 0 auto 20px; }
+    .hero-desc { max-width: 680px; font-size: 1.05rem; line-height: 1.7; color: rgba(200,210,240,0.75); margin: 0 auto 36px; }
 
-    /* CTA Buttons */
-    .cta-group {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 64px;
-    }
+    .cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
     .cta-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 32px;
+      display: inline-flex; align-items: center; gap: 10px; padding: 15px 32px;
       background: linear-gradient(135deg, #00c8ff 0%, #0070f3 100%);
-      color: #fff;
-      font-family: var(--font-heading, sans-serif);
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 12px;
-      text-decoration: none;
-      box-shadow: 0 8px 28px rgba(0,112,243,0.45);
-      transition: transform 0.2s, box-shadow 0.2s;
+      color: #fff; font-family: var(--font-heading, sans-serif); font-size: 1rem;
+      font-weight: 700; border-radius: 12px; text-decoration: none;
+      box-shadow: 0 8px 28px rgba(0,112,243,0.45); transition: transform 0.2s, box-shadow 0.2s;
     }
     .cta-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(0,112,243,0.6); }
     .cta-video {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 32px;
+      display: inline-flex; align-items: center; gap: 10px; padding: 15px 32px;
       background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-      color: #fff;
-      font-family: var(--font-heading, sans-serif);
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 12px;
-      text-decoration: none;
-      box-shadow: 0 8px 28px rgba(124,58,237,0.45);
-      transition: transform 0.2s, box-shadow 0.2s;
+      color: #fff; font-family: var(--font-heading, sans-serif); font-size: 1rem;
+      font-weight: 700; border-radius: 12px; text-decoration: none;
+      box-shadow: 0 8px 28px rgba(124,58,237,0.45); transition: transform 0.2s, box-shadow 0.2s;
     }
     .cta-video:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(124,58,237,0.6); }
-
-    /* Stats row */
-    .stats-row {
-      display: flex;
-      gap: 28px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 64px;
+    .cta-about {
+      display: inline-flex; align-items: center; gap: 10px; padding: 15px 32px;
+      background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.3);
+      color: #fff; font-family: var(--font-heading, sans-serif); font-size: 1rem;
+      font-weight: 700; border-radius: 12px; text-decoration: none;
+      transition: transform 0.2s, background 0.2s;
     }
+    .cta-about:hover { transform: translateY(-3px); background: rgba(0,240,255,0.15); }
+
+    .stats-row { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
     .stat-chip {
-      background: rgba(0,240,255,0.07);
-      border: 1px solid rgba(0,240,255,0.18);
-      border-radius: 12px;
-      padding: 16px 24px;
-      text-align: center;
-      min-width: 140px;
+      background: rgba(0,240,255,0.07); border: 1px solid rgba(0,240,255,0.18);
+      border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 140px;
     }
-    .stat-chip .s-num {
-      font-family: var(--font-heading, sans-serif);
-      font-size: 1.7rem;
-      font-weight: 900;
-      color: var(--cyan, #00f0ff);
-      display: block;
-    }
-    .stat-chip .s-lbl {
-      font-family: var(--font-mono, monospace);
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      color: rgba(200,210,240,0.6);
-      text-transform: uppercase;
-    }
+    .stat-chip .s-num { font-family: var(--font-heading, sans-serif); font-size: 1.7rem; font-weight: 900; color: var(--cyan, #00f0ff); display: block; }
+    .stat-chip .s-lbl { font-family: var(--font-mono, monospace); font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(200,210,240,0.6); text-transform: uppercase; }
 
-    /* Parameter explanation cards */
-    .params-section {
-      width: 100%;
-      max-width: 1100px;
-      margin: 0 auto 60px;
-    }
-    .params-section h2 {
-      font-family: var(--font-heading, sans-serif);
-      font-size: 1.4rem;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 8px;
-    }
-    .params-section .section-lead {
-      text-align: center;
-      color: rgba(200,210,240,0.6);
-      font-size: 0.9rem;
-      margin-bottom: 28px;
-    }
-    .param-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
+    .params-section { width: 100%; max-width: 1100px; margin: 0 auto 60px; }
+    .params-section h2 { font-family: var(--font-heading, sans-serif); font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 8px; }
+    .params-section .section-lead { text-align: center; color: rgba(200,210,240,0.6); font-size: 0.9rem; margin-bottom: 28px; }
+    .param-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
     .p-card {
-      background: rgba(5,15,40,0.7);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 22px 20px;
-      transition: border-color 0.2s, transform 0.2s;
-      position: relative;
-      overflow: hidden;
+      background: rgba(5,15,40,0.7); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 22px 20px; transition: border-color 0.2s, transform 0.2s;
+      position: relative; overflow: hidden;
     }
-    .p-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      border-radius: 16px 16px 0 0;
-    }
+    .p-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 16px 16px 0 0; }
     .p-card.c-model::before  { background: linear-gradient(90deg, #818cf8, #6366f1); }
     .p-card.c-noise::before  { background: linear-gradient(90deg, #f4d35e, #f59e0b); }
     .p-card.c-color::before  { background: linear-gradient(90deg, #ff6b9d, #ff2a5f); }
     .p-card.c-gray::before   { background: linear-gradient(90deg, #00f0ff, #0070f3); }
     .p-card.c-temp::before   { background: linear-gradient(90deg, #00ff87, #10b981); }
     .p-card:hover { border-color: rgba(0,240,255,0.3); transform: translateY(-3px); }
-    .p-card-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .p-card-icon  { font-size: 1.8rem; margin-bottom: 10px; }
     .p-card-title { font-family: var(--font-heading, sans-serif); font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
-    .p-card-desc { font-size: 0.82rem; color: rgba(200,210,240,0.6); line-height: 1.5; margin-bottom: 14px; }
-    .p-card-tags { display: flex; flex-direction: column; gap: 4px; font-family: monospace; font-size: 0.72rem; }
+    .p-card-desc  { font-size: 0.82rem; color: rgba(200,210,240,0.6); line-height: 1.5; margin-bottom: 14px; }
+    .p-card-tags  { display: flex; flex-direction: column; gap: 4px; font-family: monospace; font-size: 0.72rem; }
     .real-tag { color: #00ff87; } .fake-tag { color: #ff4757; }
 
-    /* Footer nav */
-    .welcome-footer {
-      text-align: center;
-      padding: 32px 20px 48px;
-    }
+    .welcome-footer { text-align: center; padding: 32px 20px 48px; }
     .welcome-footer p { color: rgba(200,210,240,0.5); font-size: 0.85rem; margin-bottom: 16px; }
     .footer-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
     .footer-link {
-      padding: 10px 20px;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      color: rgba(200,210,240,0.7);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: border-color 0.2s, color 0.2s;
+      padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: rgba(200,210,240,0.7); text-decoration: none;
+      font-size: 0.9rem; transition: border-color 0.2s, color 0.2s;
     }
     .footer-link:hover { border-color: var(--cyan, #00f0ff); color: #fff; }
   </style>
@@ -282,7 +207,7 @@
 
       <!-- Logo -->
       <div class="hero-logo-wrap">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Unmasking the Deepfake Logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Unmasking Deepfake Logo">
       </div>
 
       <p class="hero-eyebrow">⚡ RESNET18-LSTM · ONNX RUNTIME · MULTI-SCALE FORENSICS</p>
@@ -294,39 +219,24 @@
       </p>
 
       <div class="cta-group">
-        <a href="{{ url_for('image_lab') }}" class="cta-primary">
-          🖼️ &nbsp; Analyze an Image
-        </a>
-        <a href="{{ url_for('video') }}" class="cta-video">
-          🎬 &nbsp; Analyze a Video
-        </a>
+        <a href="{{ url_for('image_lab') }}" class="cta-primary">🖼️ &nbsp; Analyze an Image</a>
+        <a href="{{ url_for('video') }}"     class="cta-video">🎬 &nbsp; Analyze a Video</a>
+        <a href="{{ url_for('about') }}"     class="cta-about">ℹ️ &nbsp; How It Works</a>
       </div>
 
       <!-- Stats -->
       <div class="stats-row">
-        <div class="stat-chip">
-          <span class="s-num">5</span>
-          <span class="s-lbl">Forensic Parameters</span>
-        </div>
-        <div class="stat-chip">
-          <span class="s-num">ONNX</span>
-          <span class="s-lbl">Neural Engine</span>
-        </div>
-        <div class="stat-chip">
-          <span class="s-num">12</span>
-          <span class="s-lbl">Video Frames Analysed</span>
-        </div>
-        <div class="stat-chip">
-          <span class="s-num">&lt;15s</span>
-          <span class="s-lbl">Video Analysis Time</span>
-        </div>
+        <div class="stat-chip"><span class="s-num">5</span><span class="s-lbl">Forensic Parameters</span></div>
+        <div class="stat-chip"><span class="s-num">ONNX</span><span class="s-lbl">Neural Engine</span></div>
+        <div class="stat-chip"><span class="s-num">12</span><span class="s-lbl">Video Frames Analyzed</span></div>
+        <div class="stat-chip"><span class="s-num">&lt;15s</span><span class="s-lbl">Video Analysis Time</span></div>
       </div>
     </div>
 
-    <!-- PARAMETER BREAKDOWN EXPLANATION -->
+    <!-- PARAMETER BREAKDOWN -->
     <div class="params-section">
       <h2>📊 HOW REAL % &amp; DEEPFAKE % ARE CALCULATED</h2>
-      <p class="section-lead">Each parameter scores the media on a 0–100% scale. Higher = more suspicious. Combined weighted score gives the final Real vs Deepfake split.</p>
+      <p class="section-lead">Each parameter scores the media on a 0–100% scale. Higher = more suspicious. Combined weighted score gives the final verdict.</p>
 
       <div class="param-cards-grid">
         <div class="p-card c-model">
@@ -342,7 +252,7 @@
         <div class="p-card c-noise">
           <div class="p-card-icon">📐</div>
           <div class="p-card-title">Noise Blueprint</div>
-          <div class="p-card-desc">Extracts multi-scale high-frequency noise residuals (median diff, Gaussian high-pass, Laplacian). Real cameras produce uniform physical grain; fakes show smooth/uneven synthetic noise.</div>
+          <div class="p-card-desc">Extracts multi-scale high-frequency noise residuals. Real cameras produce uniform physical grain; fakes show smooth or uneven synthetic noise.</div>
           <div class="p-card-tags">
             <span class="real-tag">✓ Real: Natural sensor grain</span>
             <span class="fake-tag">▲ Fake: Smooth / irregular texture</span>
@@ -352,7 +262,7 @@
         <div class="p-card c-color">
           <div class="p-card-icon">🎨</div>
           <div class="p-card-title">Color Balance &amp; HSV</div>
-          <div class="p-card-desc">Evaluates RGB channel balance, HSV saturation distribution and LAB color residual shifts. Deepfake blending leaves unnatural color boundary transitions.</div>
+          <div class="p-card-desc">Evaluates RGB channel balance, HSV saturation distribution and LAB color residuals. Deepfake blending leaves unnatural color boundary transitions.</div>
           <div class="p-card-tags">
             <span class="real-tag">✓ Real: Balanced HSV spectrum</span>
             <span class="fake-tag">▲ Fake: Color boundary distortion</span>
@@ -372,7 +282,7 @@
         <div class="p-card c-temp">
           <div class="p-card-icon">⏱️</div>
           <div class="p-card-title">Temporal Forensics<br><small style="color:rgba(200,210,240,0.5)">(Video only)</small></div>
-          <div class="p-card-desc">Measures inter-frame optical flow shifts, noise variance jitter and flickering across extracted frames. Deepfake videos show high temporal incoherence.</div>
+          <div class="p-card-desc">Measures inter-frame optical flow shifts, noise variance jitter and flickering. Deepfake videos show high temporal incoherence.</div>
           <div class="p-card-tags">
             <span class="real-tag">✓ Real: Smooth motion</span>
             <span class="fake-tag">▲ Fake: High flicker / jitter</span>
@@ -386,7 +296,8 @@
       <p>Ready to begin? Choose your analysis mode below:</p>
       <div class="footer-links">
         <a href="{{ url_for('image_lab') }}" class="footer-link">🖼️ Single Image Lab</a>
-        <a href="{{ url_for('video') }}" class="footer-link">🎬 Video Frame Lab</a>
+        <a href="{{ url_for('video') }}"     class="footer-link">🎬 Video Frame Lab</a>
+        <a href="{{ url_for('about') }}"     class="footer-link">ℹ️ How It Works</a>
       </div>
     </div>
 

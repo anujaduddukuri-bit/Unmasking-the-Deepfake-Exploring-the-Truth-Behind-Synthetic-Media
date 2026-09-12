@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How It Works | Unmasking Deepfake AI Forensics</title>
+  <meta name="description" content="Learn how Unmasking Deepfake analyzes synthetic media through neural spatial representations, inter-frame temporal sequence analysis, and Noise Blueprint decomposition.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://unmasking-deepfake.vercel.app/about">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://unmasking-deepfake.vercel.app/about">
+  <meta property="og:title"       content="How Unmasking Deepfake Works — Media Verification Science">
+  <meta property="og:description" content="Deconstructing generative AI artifacts using ResNet-18, LSTM sequence models, and frequency domain noise blueprints.">
+  <meta property="og:image"       content="{{ url_for('static', filename='logo.png') }}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="How Unmasking Deepfake Works | AI Forensics">
+  <meta name="twitter:description" content="Technical breakdown of synthetic media detection and visual artifact analysis.">
+  <meta name="twitter:image"       content="{{ url_for('static', filename='logo.png') }}">
+
+  <!-- Favicon -->
+  <link rel="icon"             type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon"             type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <link rel="icon"             type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180"  href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <meta name="theme-color" content="#020617">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    .about-section {
+      margin-bottom: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-section h2 {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .about-section h2 .section-num {
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      background: rgba(0, 240, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+    .about-p {
+      color: var(--text-secondary);
+      font-size: 1.02rem;
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+    .features-quad {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .feature-card {
+      background: rgba(11, 19, 41, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 240, 255, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
+    }
+    .feature-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    /* Flowchart Visual Box */
+    .flowchart-diagram {
+      background: rgba(2, 6, 23, 0.85);
+      border: 1px solid var(--border-cyan);
+      border-radius: 14px;
+      padding: 24px;
+      margin: 20px 0;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.1);
+    }
+    .flow-steps-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .flow-node {
+      background: rgba(11, 19, 41, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 14px 18px;
+      border-radius: 10px;
+      text-align: center;
+      flex: 1;
+      min-width: 140px;
+    }
+    .flow-node .node-icon { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+    .flow-node .node-title { font-family: var(--font-heading); font-size: 0.85rem; color: #fff; font-weight: 700; }
+    .flow-node .node-desc { font-family: var(--font-mono); font-size: 0.7rem; color: var(--cyan); }
+    .flow-arrow { color: var(--cyan); font-size: 1.2rem; font-weight: bold; }
+    /* Spectrum Boxes */
+    .confidence-spectrum {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+    .spectrum-box {
+      border-radius: 14px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+    .spectrum-real {
+      background: linear-gradient(135deg, rgba(0, 255, 135, 0.1) 0%, rgba(2, 6, 23, 0.8) 100%);
+      border-color: rgba(0, 255, 135, 0.35);
+      box-shadow: 0 0 20px rgba(0, 255, 135, 0.1);
+    }
+    .spectrum-uncertain {
+      background: linear-gradient(135deg, rgba(244, 211, 94, 0.1) 0%, rgba(2, 6, 23, 0.8) 100%);
+      border-color: rgba(244, 211, 94, 0.35);
+      box-shadow: 0 0 20px rgba(244, 211, 94, 0.1);
+    }
+    .spectrum-fake {
+      background: linear-gradient(135deg, rgba(255, 42, 95, 0.1) 0%, rgba(2, 6, 23, 0.8) 100%);
+      border-color: rgba(255, 42, 95, 0.35);
+      box-shadow: 0 0 20px rgba(255, 42, 95, 0.12);
+    }
+    .spectrum-box h4 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+    }
+    .spectrum-real h4 { color: #00ff87; }
+    .spectrum-uncertain h4 { color: #f4d35e; }
+    .spectrum-fake h4 { color: #ff2a5f; }
+  </style>
+</head>
+<body>
+  <div class="app-background"></div>
+  <main class="main-container">
+    <header class="hero-header">
+      <div style="display:flex; justify-content:center; align-items:center; margin-bottom:14px;">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Unmasking Deepfake Logo" style="width:72px; height:72px; border-radius:50%; border:2px solid #00f0ff; box-shadow:0 0 24px rgba(0,240,255,0.5);">
+      </div>
+      <div class="header-badge-row">
+        <span class="cyber-badge"><i class="glow-dot"></i> FORENSIC ARCHITECTURE &amp; VERIFICATION METHODOLOGY</span>
+      </div>
+      <h1 class="main-title">HOW IT WORKS</h1>
+      <p class="main-subtitle">A comprehensive breakdown of multi-modal neural feature extraction, sensor noise decomposition, and temporal video forensics.</p>
+
+      <nav class="nav-bar">
+        <a href="{{ url_for('welcome') }}"   class="nav-item nav-link">← Welcome</a>
+        <a href="{{ url_for('image_lab') }}" class="nav-item nav-link">Single Image Lab</a>
+        <a href="{{ url_for('video') }}"     class="nav-item nav-link">Video Frame Lab</a>
+        <span class="nav-item active">How It Works</span>
+      </nav>
+    </header>
+
+    <!-- Section 1: Overview -->
+    <section class="panel glass-card about-section">
+      <h2><span class="section-num">01</span> What Unmasking Deepfake Does</h2>
+      <p class="about-p">
+        <strong>Unmasking Deepfake</strong> is a deep forensic intelligence suite developed to authenticate visual media in the era of generative AI (diffusion models, GANs, and neural video reenactment). While generative models produce photorealistic visual surfaces, they struggle to replicate the microscopic physical characteristics of authentic hardware cameras.
+      </p>
+      <p class="about-p">
+        Instead of operating as an uninterpretable "black box," Unmasking Deepfake extracts independent forensic telemetry layers alongside an AI confidence score:
+      </p>
+      <div class="features-quad">
+        <div class="feature-card">
+          <h3>🔬 Optical Sensor Grain</h3>
+          <p>Authentic camera sensors introduce Photo Response Non-Uniformity (PRNU) and photon shot noise. Deepfake models smooth out or unnaturally stipple these high-frequency patterns.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🧠 Neural Sequence Memory</h3>
+          <p>A fine-tuned ResNet-18 convolutional backbone maps spatial visual features into an LSTM recurrent sequence layer evaluated via high-performance ONNX Runtime.</p>
+        </div>
+        <div class="feature-card">
+          <h3>⏱️ Inter-Frame Stability</h3>
+          <p>Video deepfakes frequently exhibit phase flickering, subtle lighting drift, and boundary inconsistencies between adjacent frames.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Image Pipeline -->
+    <section class="panel glass-card about-section">
+      <h2><span class="section-num">02</span> How Image Analysis Works</h2>
+      <p class="about-p">
+        When an image is submitted to the Single Image Lab, it undergoes three simultaneous analytical tracks:
+      </p>
+      <div class="flowchart-diagram">
+        <div class="flow-steps-row">
+          <div class="flow-node">
+            <span class="node-icon">📷</span>
+            <div class="node-title">Input Media</div>
+            <div class="node-desc">Native RGB Pixels</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">📐</span>
+            <div class="node-title">Noise Blueprint</div>
+            <div class="node-desc">3-Scale Residual Filter</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">🔥</span>
+            <div class="node-title">Thermal Heatmap</div>
+            <div class="node-desc">Localized JET Anomaly</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">🧠</span>
+            <div class="node-title">ONNX ResNet-18</div>
+            <div class="node-desc">Spatial Feature Vector</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">🛡️</span>
+            <div class="node-title">Calibrated Verdict</div>
+            <div class="node-desc">3-Tier Verification</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Video Temporal Pipeline -->
+    <section class="panel glass-card about-section">
+      <h2><span class="section-num">03</span> How Video Analysis Works (&lt;15s Architecture)</h2>
+      <p class="about-p">
+        Video deepfake forensics must balance comprehensive temporal inspection with real-time execution speeds. By avoiding sequential frame-by-frame decoding, our seek-based algorithm extracts uniform sequence keyframes across the timeline in milliseconds:
+      </p>
+      <div class="flowchart-diagram">
+        <div class="flow-steps-row">
+          <div class="flow-node">
+            <span class="node-icon">🎬</span>
+            <div class="node-title">Video Stream</div>
+            <div class="node-desc">MP4 / WEBM / MOV</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">⚡</span>
+            <div class="node-title">O(1) Seek Extraction</div>
+            <div class="node-desc">Up to 30 Keyframes</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">⚙️</span>
+            <div class="node-title">Parallel Threads</div>
+            <div class="node-desc">Concurrent Forensics</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">📈</span>
+            <div class="node-title">Temporal Metrics</div>
+            <div class="node-desc">Jitter &amp; Motion Drift</div>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">
+            <span class="node-icon">📊</span>
+            <div class="node-title">Forensic Dossier</div>
+            <div class="node-desc">Interactive Dashboard</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Noise Blueprint Explained -->
+    <section class="panel glass-card about-section">
+      <h2><span class="section-num">04</span> What the Noise Blueprint Represents</h2>
+      <p class="about-p">
+        The <strong>Noise Blueprint</strong> is Unmasking Deepfake's signature forensic visualization. It strips high-level semantic color and isolates microscopic high-frequency residuals, projecting them as white and cyan granular sand stippling against a dark midnight Prussian navy blue (#030a16) blueprint canvas.
+      </p>
+      <div class="features-quad">
+        <div class="feature-card">
+          <h3 style="color:#00ff87;">Natural Sensor PRNU</h3>
+          <p>Real hardware cameras produce an organic, uniform distribution of micro-stippling across light and shadow regions without abrupt frequency drops.</p>
+        </div>
+        <div class="feature-card">
+          <h3 style="color:#ff2a5f;">Generative Blending Seams</h3>
+          <p>GANs and diffusion models create localized blurred zones or unnatural checkerboard patterns where the synthetic face was pasted onto the original body.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Thermal Heatmap -->
+    <section class="panel glass-card about-section">
+      <h2><span class="section-num">05</span> What the Heatmap Represents</h2>
+      <p class="about-p">
+        The <strong>Thermal Heatmap</strong> converts mathematical residual gradients into a JET colormap overlay. It highlights where anomalous features concentrate:
+      </p>
+      <ul style="color:var(--text-secondary); line-height:1.8; margin-left:24px; font-size:0.95rem;">
+        <li><strong style="color:#38bdf8;">Deep Blue:</strong> Low localized residual variance consistent with authentic baseline capture.</li>
+        <li><strong style="color:#f4d35e;">Yellow / Orange:</strong> Elevated frequency disruption or chromatic shift.</li>
+        <li><strong style="color:#ff2a5f;">Hot Red:</strong> Highest concentration of structural anomalies, frequently aligning with deepfake facial bounding boxes or synthetic eye/mouth warps.</li>
+      </ul>
+    </section>
+
+    <!-- Section 6: Calibrated 3-Tier Wording -->
+    <section class="panel glass-card about-section">
+      <h2><span class="section-num">06</span> What the Confidence Score Means (3-Tier Verdict)</h2>
+      <p class="about-p">
+        Rather than forcing a simplistic 50/50 binary guess that misclassifies real high-texture photos, our engine evaluates evidence along three calibrated certainty bands:
+      </p>
+      <div class="confidence-spectrum">
+        <div class="spectrum-box spectrum-real">
+          <h4>VERIFIED AUTHENTIC MEDIA — REAL</h4>
+          <strong style="color:#00ff87; font-size:1.1rem;">Confidence: 65% – 100%</strong>
+          <p style="font-size:0.85rem; margin-top:8px; color:rgba(200,240,220,0.85);">
+            Sensor noise, chromatic optics, and neural features closely align with authentic hardware camera baselines.
+          </p>
+        </div>
+        <div class="spectrum-box spectrum-uncertain">
+          <h4>AUTHENTICITY COULD NOT BE VERIFIED</h4>
+          <strong style="color:#f4d35e; font-size:1.1rem;">Intermediate Band (38% – 64%)</strong>
+          <p style="font-size:0.85rem; margin-top:8px; color:rgba(255,240,180,0.85);">
+            Signals fall in an inconclusive zone. Compression artifacts or low-light noise prevent a definitive mathematical verdict.
+          </p>
+        </div>
+        <div class="spectrum-box spectrum-fake">
+          <h4>VERIFIED AUTHENTIC MEDIA — FAKE</h4>
+          <strong style="color:#ff2a5f; font-size:1.1rem;">Confidence: 65% – 100%</strong>
+          <p style="font-size:0.85rem; margin-top:8px; color:rgba(255,180,190,0.85);">
+            High concentration of generative boundaries, temporal sequence jitter, or neural manipulation signatures.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Limitations -->
+    <section class="panel glass-card about-section">
+      <h2><span class="section-num">07</span> Forensic Limitations &amp; Best Practices</h2>
+      <p class="about-p">
+        AI-based media forensics is an evolving field. Social media platforms (such as WhatsApp, Instagram, or TikTok) apply aggressive lossy re-compression algorithms that discard fine high-frequency sensor noise. Unmasking Deepfake is designed as a rigorous decision-support instrument and should be evaluated alongside provenance data and contextual facts.
+      </p>
+      <div style="text-align: center; margin-top: 32px;">
+        <a href="{{ url_for('image_lab') }}" class="btn-primary" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:14px 28px;">
+          <span>Single Image Lab</span> <span>→</span>
+        </a>
+        <a href="{{ url_for('video') }}" class="btn-secondary" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:14px 28px; margin-left:14px;">
+          <span>Video Frame Lab</span> <span>→</span>
+        </a>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <p>© 2026 Unmasking Deepfake Intelligence · Open AI Media Verification System</p>
+    </footer>
+  </main>
+</body>
+</html>

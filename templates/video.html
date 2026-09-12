@@ -3,11 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Unmasking the Deepfake | Video Frame Lab</title>
+  <title>Unmasking Deepfake | Video Frame Forensic Lab</title>
+  <meta name="description" content="Upload a video to detect deepfake manipulation using temporal forensics — 12-frame analysis, noise blueprint per frame, and AI confidence scoring in under 15 seconds.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://unmasking-deepfake.vercel.app/video">
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Unmasking Deepfake | Video Frame Forensic Lab">
+  <meta property="og:description" content="Detect deepfake videos with frame-by-frame AI forensics. Results in under 15 seconds.">
+  <meta property="og:image"       content="{{ url_for('static', filename='logo.png') }}">
+
+  <!-- Favicon -->
+  <link rel="icon"             type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon"             type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <link rel="icon"             type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180"  href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <meta name="theme-color" content="#020617">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Video preview area */
+    #preview-wrapper {
+      width: 100%;
+      max-width: 640px;
+      margin: 18px auto 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(0,240,255,0.25);
+      background: #000;
+    }
+    #preview-wrapper video {
+      width: 100%;
+      display: block;
+      max-height: 360px;
+      object-fit: contain;
+    }
+
+    /* Processing steps */
+    .processing-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 18px;
+      width: 100%;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .proc-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.88rem;
+      color: rgba(200,210,240,0.6);
+      transition: all 0.35s ease;
+    }
+    .proc-step.active {
+      background: rgba(0,240,255,0.08);
+      border-color: rgba(0,240,255,0.3);
+      color: #fff;
+    }
+    .proc-step.done {
+      background: rgba(0,255,135,0.07);
+      border-color: rgba(0,255,135,0.25);
+      color: rgba(200,240,220,0.85);
+    }
+    .proc-step.done .step-icon  { color: #00ff87; }
+    .proc-step.active .step-icon { color: var(--cyan,#00f0ff); animation: spin 1s linear infinite; }
+    .step-icon { font-size: 1.1rem; width: 22px; text-align: center; transition: color 0.3s; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
   <div class="app-background"></div>
@@ -21,19 +93,20 @@
         <span class="tech-pill">FAST ANALYSIS (&lt;15s)</span>
       </div>
       <h1 class="main-title">VIDEO FRAME LAB</h1>
-      <p class="main-subtitle">Multi-Frame Temporal Deepfake Detection & Separate Frame Decomposition</p>
+      <p class="main-subtitle">Multi-Frame Temporal Deepfake Detection &amp; Separate Frame Decomposition</p>
       
       <nav class="nav-bar">
-        <a href="{{ url_for('welcome') }}" class="nav-item nav-link">← Welcome Page</a>
+        <a href="{{ url_for('welcome') }}"   class="nav-item nav-link">← Welcome</a>
         <a href="{{ url_for('image_lab') }}" class="nav-item nav-link">Single Image Lab</a>
         <span class="nav-item active">Video Frame Lab</span>
+        <a href="{{ url_for('about') }}"     class="nav-item nav-link">How It Works</a>
       </nav>
     </header>
 
     <section class="upload-panel glass-card">
       <div class="feature-pills-row">
-        <span class="feat-pill">⏱️ Max 30 FPS Ceiling</span>
-        <span class="feat-pill">🎞️ 30 Separate Frames</span>
+        <span class="feat-pill">⏱️ Max 15 FPS Ceiling</span>
+        <span class="feat-pill">🎞️ 12 Separate Frames</span>
         <span class="feat-pill">🧠 ONNX Sequence Model</span>
         <span class="feat-pill">📊 Dedicated Dossier Report</span>
       </div>
@@ -45,23 +118,32 @@
         </div>
         <div class="drop-text-group">
           <strong class="drop-title">Drop video media here or click to browse</strong>
-          <span class="drop-sub">Supports MP4, AVI, MOV, MKV, or WEBM · Up to 30 frames extracted</span>
+          <span class="drop-sub">Supports MP4, AVI, MOV, MKV, or WEBM · Up to 12 frames extracted</span>
         </div>
         <input id="file" type="file" accept="video/*" hidden>
       </label>
       
-      <div id="preview-wrapper" class="preview-container" hidden>
-        <video id="preview" controls muted></video>
+      <!-- Video preview — shows the actual uploaded video -->
+      <div id="preview-wrapper" class="preview-container" hidden style="display:none;">
+        <video id="preview" controls muted playsinline></video>
       </div>
-      
+
       <button id="analyze" class="btn-primary" disabled>
-        <span class="btn-text">Extract & Analyze Video Sequence</span>
+        <span class="btn-text">Extract &amp; Analyze Video Sequence</span>
         <span class="btn-icon">⚡</span>
       </button>
       
+      <!-- Processing steps progress indicator -->
       <div id="progress-container" class="progress-box" hidden>
         <div class="cyber-spinner"></div>
         <p id="status" class="status-msg" role="status">Ready to analyze</p>
+        <div class="processing-steps" id="proc-steps">
+          <div class="proc-step" id="step-1"><span class="step-icon">📁</span> Video uploaded</div>
+          <div class="proc-step" id="step-2"><span class="step-icon">🎞️</span> Extracting frames</div>
+          <div class="proc-step" id="step-3"><span class="step-icon">🧠</span> Analyzing frames</div>
+          <div class="proc-step" id="step-4"><span class="step-icon">📐</span> Generating visualizations</div>
+          <div class="proc-step" id="step-5"><span class="step-icon">✅</span> Analysis complete</div>
+        </div>
       </div>
     </section>
 
@@ -70,13 +152,13 @@
       <div class="expl-grid-3">
         <div class="expl-card">
           <div class="expl-icon">⏱️</div>
-          <h4>Uniform Frame Sampling (Max 30 FPS)</h4>
-          <p>Extracts up to 30 individual frames spaced uniformly across the timeline at a strict ceiling of 30 FPS, preserving key motion dynamics and facial micro-expressions.</p>
+          <h4>Intelligent Frame Sampling (&lt;15s)</h4>
+          <p>Seeks directly to 12 uniformly spaced frames using hardware-accelerated frame seeking — no sequential read of every frame. Typically completes in under 15 seconds.</p>
         </div>
         <div class="expl-card">
           <div class="expl-icon">🖼️</div>
           <h4>Separate Frame Forensics</h4>
-          <p>Every single extracted frame is evaluated individually with its dedicated Noise Blueprint and Heatmap.</p>
+          <p>Every single extracted frame is evaluated individually with its dedicated Noise Blueprint and Heatmap, each classified as REAL, UNCERTAIN, or FAKE.</p>
         </div>
         <div class="expl-card">
           <div class="expl-icon">📈</div>
@@ -84,9 +166,11 @@
           <p>Calculates inter-frame flickering, optical flow luminance shift, and noise variance jitter across adjacent frames to identify generative incoherence.</p>
         </div>
       </div>
+      <div style="text-align:center; margin-top:24px;">
+        <a href="{{ url_for('about') }}" style="color:var(--cyan,#00f0ff); text-decoration:none; font-size:0.9rem;">ℹ️ Full explanation of how video analysis works →</a>
+      </div>
     </section>
   </main>
   <script src="{{ url_for('static', filename='video.js') }}"></script>
 </body>
 </html>
-
