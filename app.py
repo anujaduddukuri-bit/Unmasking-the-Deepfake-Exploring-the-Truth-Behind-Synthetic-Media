@@ -76,6 +76,8 @@ def video():
 def about():
     return render_template("about.html")
 
+_REPORTS_CACHE = {}
+
 def _normalize_video_report(data, job_id):
     """Ensure all required forensic telemetry fields exist for backwards compatibility and resilience."""
     frames = data.get("frames", [])
@@ -88,6 +90,14 @@ def _normalize_video_report(data, job_id):
             frame["frame_verdict"] = "FAKE" if susp >= 50.0 else "REAL"
         if frame.get("frame_verdict") == "FAKE":
             suspicious_count += 1
+        # Convert any legacy relative URLs into base64 data URIs so they never 404 on Vercel
+        for key in ("original_image", "blueprint_image", "heatmap_image"):
+            val = frame.get(key, "")
+            if val and not str(val).startswith("data:"):
+                fname = Path(str(val)).name
+                fpath = VIDEO_FRAMES_DIR / job_id / fname
+                if fpath.exists():
+                    frame[key] = _b64(fpath, _mime(fpath))
 
     real_count = max(0, total_frames - suspicious_count)
     inconsistency = float(data.get("temporal_inconsistency_score", 15.0))
@@ -132,21 +142,55 @@ def _normalize_video_report(data, job_id):
 
 @app.get("/video-results/<job_id>")
 def video_results(job_id):
-    report_file = VIDEO_FRAMES_DIR / job_id / "report.json"
-    if not report_file.exists():
+    data = _REPORTS_CACHE.get(job_id)
+    if not data:
+        report_file = VIDEO_FRAMES_DIR / job_id / "report.json"
+        if report_file.exists():
+            try:
+                with open(report_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                pass
+    if not data:
+        from utils import REPORTS_DIR
+        rep_file = REPORTS_DIR / f"{job_id}.json"
+        if rep_file.exists():
+            try:
+                with open(rep_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                pass
+
+    if not data:
         abort(404, description="Video analysis job not found.")
-    with open(report_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
+
     data = _normalize_video_report(data, job_id)
     return render_template("video_results.html", result=data, job_id=job_id)
 
 @app.get("/video-results/<job_id>/data")
 def video_results_data(job_id):
-    report_file = VIDEO_FRAMES_DIR / job_id / "report.json"
-    if not report_file.exists():
+    data = _REPORTS_CACHE.get(job_id)
+    if not data:
+        report_file = VIDEO_FRAMES_DIR / job_id / "report.json"
+        if report_file.exists():
+            try:
+                with open(report_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                pass
+    if not data:
+        from utils import REPORTS_DIR
+        rep_file = REPORTS_DIR / f"{job_id}.json"
+        if rep_file.exists():
+            try:
+                with open(rep_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                pass
+
+    if not data:
         return jsonify(error="Job not found"), 404
-    with open(report_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
+
     data = _normalize_video_report(data, job_id)
     return jsonify(data)
 
@@ -218,6 +262,7 @@ def analyze_video():
     try:
         file.save(path)
         result = predict_video(path, job_id, demonstration_mode=False)
+        _REPORTS_CACHE[job_id] = result
         result["redirect_url"] = f"/video-results/{job_id}"
         return jsonify(result)
     except (ValueError, UnidentifiedImageError):

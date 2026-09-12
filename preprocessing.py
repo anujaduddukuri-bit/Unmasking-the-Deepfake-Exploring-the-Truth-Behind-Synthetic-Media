@@ -38,7 +38,7 @@ def preprocess_frames(frames):
         return batched
 
 
-def extract_video_frames(video_path, max_frames=30, max_fps=30):
+def extract_video_frames(video_path, max_frames=16, max_fps=30):
     """Extract individual RGB frames uniformly across the video using seek.
 
     Uses cv2.CAP_PROP_POS_FRAMES to jump directly to each target frame index

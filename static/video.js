@@ -148,6 +148,13 @@ button.addEventListener('click', async () => {
     const r = await response.json();
     if (!response.ok) throw Error(r.error || 'Video analysis failed');
 
+    try {
+      sessionStorage.setItem('video_report_' + r.job_id, JSON.stringify(r));
+      sessionStorage.setItem('last_video_report', JSON.stringify(r));
+    } catch (e) {
+      console.warn('Could not cache report in sessionStorage:', e);
+    }
+
     // Mark steps complete
     setStep(step2, 'done');
     setStep(step3, 'done');
